@@ -33,7 +33,7 @@
       </ul>
     </li>
 
-    <!-- New "Unit" Sidebar -->
+    <!-- New "Unidt" Sidebar -->
     <li class="sidebar-list-item">
       <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('unitMenu', this); setActiveLink(this)">
         <i class="fas fa-warehouse me-3"></i><span class="sidebar-link-title">Employee</span>

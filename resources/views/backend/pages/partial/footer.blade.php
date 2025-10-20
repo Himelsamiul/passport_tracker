@@ -19,7 +19,7 @@
 </head>
 <body>
 
-<!-- Your project content goes here -->
+<!--       Your project content goes here -->
 
 <footer>
     <p>&copy; 2024 Your Project Name. All rights reserved.</p>

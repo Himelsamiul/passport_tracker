@@ -48,7 +48,7 @@
       color: #f39c12; /* Golden */
     }
     25% {
-      color: #e74c3c; /* Red */
+      color: #e74c3c; /* dRed */
     }
     50% {
       color: #2ecc71; /* Green */
