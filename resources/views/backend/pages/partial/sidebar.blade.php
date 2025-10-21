@@ -78,8 +78,8 @@
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
       <ul id="processingMenu" class="submenu list-unstyled d-none ps-4">
-        <li><a href="#" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Process</a></li>
-        <li><a href="#" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Process List</a></li>
+        <li><a href="{{ route('processings.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Process</a></li>
+        <li><a href="{{ route('processings.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Process List</a></li>
       </ul>
     </li>
 

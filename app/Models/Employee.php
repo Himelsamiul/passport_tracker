@@ -8,4 +8,9 @@ class Employee extends Model
 {
    protected $fillable = ['name', 'designation', 'phone', 'email'];
 
+
+   public function passportProcessings()
+   {
+       return $this->hasMany(PassportProcessing::class);
+   }
 }

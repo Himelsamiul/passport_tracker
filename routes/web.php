@@ -9,6 +9,7 @@ use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\PassportOfficerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PassportProcessingController;  
 
 Route::get('/login',  [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -69,4 +70,17 @@ Route::post('/categories/store', [CategoryController::class, 'store'])->name('ca
 Route::get('/categories/edit/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
 Route::post('/categories/update/{id}', [CategoryController::class, 'update'])->name('categories.update');
 Route::get('/categories/delete/{id}', [CategoryController::class, 'destroy'])->name('categories.delete');
+
+// -------- Passport Processings CRUD --------
+Route::get('/processings',        [PassportProcessingController::class, 'index'])->name('processings.index');
+Route::get('/processings/create', [PassportProcessingController::class, 'create'])->name('processings.create');
+Route::post('/processings',        [PassportProcessingController::class, 'store'])->name('processings.store');
+Route::get('/processings/{processing}', [PassportProcessingController::class, 'show'])->name('processings.show');
+Route::get('/processings/{processing}/edit', [PassportProcessingController::class, 'edit'])->name('processings.edit');
+Route::put('/processings/{processing}', [PassportProcessingController::class, 'update'])->name('processings.update');
+Route::delete('/processings/{processing}', [PassportProcessingController::class, 'destroy'])->name('processings.destroy');
+
+// AJAX to load full Add Passport content into the form
+Route::get('/processings/passport-details/{passport}', [PassportProcessingController::class, 'passportDetails'])
+    ->name('processings.passport.details');
 });
