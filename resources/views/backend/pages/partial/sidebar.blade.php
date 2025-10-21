@@ -40,8 +40,8 @@
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
       <ul id="unitMenu" class="submenu list-unstyled d-none ps-4">
-        <li><a href="" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Employee</a></li>
-        <li><a href="" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Employee list</a></li>
+        <li><a href="{{ route('employees.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Employee</a></li>
+        <li><a href="{{ route('employees.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Employee list</a></li>
       </ul>
     </li>
 
@@ -52,16 +52,21 @@
     <i class="fas fa-chevron-right ms-auto"></i>
   </a>
   <ul id="sizeMenu" class="submenu list-unstyled d-none ps-4">
-    <li><a href="" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Agencies</a></li>
-    <li><a href="" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Agencies List</a></li>
+    <li><a href="{{ route('agencies.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Agencies</a></li>
+    <li><a href="{{ route('agencies.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Agencies List</a></li>
   </ul>
 </li>
 
-
+    <!-- Passport Transit Officer -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" role="button" id="dashboardLink" onclick="setActiveLink(this)">
-        <i class="fas fa-receipt me-3"></i><span class="sidebar-link-title">Orders</span>
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('transitMenu', this); setActiveLink(this)">
+        <i class="fas fa-people-carry me-3"></i><span class="sidebar-link-title">Passport Officer</span>
+        <i class="fas fa-chevron-right ms-auto"></i>
       </a>
+      <ul id="transitMenu" class="submenu list-unstyled d-none ps-4">
+        <li><a href="{{ route('officers.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Officer</a></li>
+        <li><a href="{{ route('officers.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Officer List</a></li>
+      </ul>
     </li>
 
 

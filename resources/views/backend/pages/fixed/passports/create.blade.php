@@ -18,6 +18,7 @@
     @csrf
 
     <div class="row g-3">
+      <!-- Agent -->
       <div class="col-md-4">
         <label class="form-label">Agent <span class="text-danger">*</span></label>
         <select name="agent_id" class="form-select" required>
@@ -28,51 +29,72 @@
         </select>
       </div>
 
+      <!-- Passport Received By -->
+      <div class="col-md-4">
+        <label class="form-label">Passport Received By <span class="text-danger">*</span></label>
+        <select name="employee_id" class="form-select" required>
+          <option value="">— Select Employee —</option>
+          @foreach($employees as $emp)
+            <option value="{{ $emp->id }}" @selected(old('employee_id')==$emp->id)>{{ $emp->name }}</option>
+          @endforeach
+        </select>
+      </div>
+
+      <!-- Applicant Name -->
       <div class="col-md-4">
         <label class="form-label">Applicant Name <span class="text-danger">*</span></label>
         <input type="text" name="applicant_name" value="{{ old('applicant_name') }}" class="form-control" required>
       </div>
 
+      <!-- Phone -->
       <div class="col-md-4">
         <label class="form-label">Phone</label>
         <input type="text" name="phone" value="{{ old('phone') }}" class="form-control">
       </div>
 
+      <!-- Address -->
       <div class="col-md-6">
         <label class="form-label">Address</label>
         <input type="text" name="address" value="{{ old('address') }}" class="form-control">
       </div>
 
+      <!-- Date of Birth -->
       <div class="col-md-3">
         <label class="form-label">Date of Birth</label>
         <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" class="form-control">
       </div>
 
+      <!-- Nationality -->
       <div class="col-md-3">
         <label class="form-label">Nationality</label>
         <input type="text" name="nationality" value="{{ old('nationality') }}" class="form-control">
       </div>
 
+      <!-- Passport Number -->
       <div class="col-md-4">
         <label class="form-label">Passport Number <span class="text-danger">*</span></label>
         <input type="text" name="passport_number" value="{{ old('passport_number') }}" class="form-control" required>
       </div>
 
+      <!-- Issue Date -->
       <div class="col-md-4">
         <label class="form-label">Issue Date</label>
         <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="form-control">
       </div>
 
+      <!-- Expiry Date -->
       <div class="col-md-4">
         <label class="form-label">Expiry Date</label>
         <input type="date" name="expiry_date" value="{{ old('expiry_date') }}" class="form-control">
       </div>
 
+      <!-- NID Number -->
       <div class="col-md-6">
         <label class="form-label">NID Number</label>
         <input type="text" name="nid_number" value="{{ old('nid_number') }}" class="form-control">
       </div>
 
+      <!-- Passport Picture -->
       <div class="col-md-6">
         <label class="form-label">Passport Picture</label>
         <input type="file" name="passport_picture" class="form-control" accept="image/*">

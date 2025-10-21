@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Passport;
 use App\Models\Agent;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,15 +13,17 @@ class PassportController extends Controller
     // LIST
     public function index()
     {
-        $passports = Passport::with('agent')->latest()->get();
+        // eager-load agent & employee
+        $passports = Passport::with(['agent','employee'])->latest()->get();
         return view('backend.pages.fixed.passports.index', compact('passports'));
     }
 
     // CREATE FORM
     public function create()
     {
-        $agents = Agent::orderBy('name')->get(['id','name']);
-        return view('backend.pages.fixed.passports.create', compact('agents'));
+        $agents    = Agent::orderBy('name')->get(['id','name']);
+        $employees = Employee::orderBy('name')->get(['id','name']);
+        return view('backend.pages.fixed.passports.create', compact('agents','employees'));
     }
 
     // STORE
@@ -28,6 +31,7 @@ class PassportController extends Controller
     {
         $request->validate([
             'agent_id'        => ['required','exists:agents,id'],
+            'employee_id'     => ['required','exists:employees,id'], // Passport Received By
             'applicant_name'  => ['required','string','max:255'],
             'address'         => ['nullable','string','max:255'],
             'phone'           => ['nullable','string','max:20'],
@@ -47,6 +51,7 @@ class PassportController extends Controller
 
         Passport::create([
             'agent_id'        => $request->agent_id,
+            'employee_id'     => $request->employee_id, // received by
             'applicant_name'  => $request->applicant_name,
             'address'         => $request->address,
             'phone'           => $request->phone,
@@ -57,7 +62,7 @@ class PassportController extends Controller
             'issue_date'      => $request->issue_date,
             'expiry_date'     => $request->expiry_date,
             'nid_number'      => $request->nid_number,
-            'status'          => 'RECEIVED_FROM_AGENT',
+            'status'          => 'RECEIVED_BY_EMPLOYEE',
         ]);
 
         return redirect()->route('passports.index')->with('success', 'Passport created.');
@@ -66,9 +71,10 @@ class PassportController extends Controller
     // EDIT FORM
     public function edit($id)
     {
-        $passport = Passport::findOrFail($id);
-        $agents   = Agent::orderBy('name')->get(['id','name']);
-        return view('backend.pages.fixed.passports.edit', compact('passport','agents'));
+        $passport  = Passport::findOrFail($id);
+        $agents    = Agent::orderBy('name')->get(['id','name']);
+        $employees = Employee::orderBy('name')->get(['id','name']);
+        return view('backend.pages.fixed.passports.edit', compact('passport','agents','employees'));
     }
 
     // UPDATE
@@ -78,6 +84,7 @@ class PassportController extends Controller
 
         $request->validate([
             'agent_id'        => ['required','exists:agents,id'],
+            'employee_id'     => ['required','exists:employees,id'], // received by
             'applicant_name'  => ['required','string','max:255'],
             'address'         => ['nullable','string','max:255'],
             'phone'           => ['nullable','string','max:20'],
@@ -92,7 +99,6 @@ class PassportController extends Controller
 
         $path = $passport->passport_picture;
         if ($request->hasFile('passport_picture')) {
-            // delete old if exists
             if ($path && Storage::disk('public')->exists($path)) {
                 Storage::disk('public')->delete($path);
             }
@@ -101,6 +107,7 @@ class PassportController extends Controller
 
         $passport->update([
             'agent_id'        => $request->agent_id,
+            'employee_id'     => $request->employee_id,
             'applicant_name'  => $request->applicant_name,
             'address'         => $request->address,
             'phone'           => $request->phone,
@@ -121,7 +128,6 @@ class PassportController extends Controller
     {
         $passport = Passport::findOrFail($id);
 
-        // delete stored file if any
         if ($passport->passport_picture && Storage::disk('public')->exists($passport->passport_picture)) {
             Storage::disk('public')->delete($passport->passport_picture);
         }

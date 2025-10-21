@@ -13,7 +13,7 @@
 
   /* Table should be wide enough to show all columns properly */
   .wide-table {
-    min-width: 1600px;
+    min-width: 1700px;
     table-layout: auto;
   }
 
@@ -63,6 +63,7 @@
         <tr>
           <th class="sticky-col">#</th>
           <th>Agent</th>
+          <th>Received By</th>
           <th>Applicant Name</th>
           <th class="address-col">Address</th>
           <th class="nowrap">Phone</th>
@@ -82,6 +83,7 @@
           <tr>
             <td class="sticky-col">{{ $idx + 1 }}</td>
             <td>{{ $p->agent?->name }}</td>
+            <td>{{ $p->employee?->name ?? '—' }}</td>
             <td class="nowrap">{{ $p->applicant_name }}</td>
             <td class="address-col">{{ $p->address }}</td>
             <td class="nowrap">{{ $p->phone }}</td>
@@ -105,7 +107,7 @@
           </tr>
         @empty
           <tr>
-            <td colspan="14" class="text-center text-muted">No passports found.</td>
+            <td colspan="15" class="text-center text-muted">No passports found.</td>
           </tr>
         @endforelse
       </tbody>
