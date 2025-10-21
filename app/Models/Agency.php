@@ -11,6 +11,7 @@ class Agency extends Model
 
     protected $fillable = [
         'name',
+        'category_id',
         'contact_person',
         'phone',
         'email',
@@ -18,4 +19,9 @@ class Agency extends Model
         'status',
         'notes',
     ];
+
+    public function category()
+{
+    return $this->belongsTo(\App\Models\Category::class);
+}
 }

@@ -4,112 +4,107 @@
   <input type="text" id="sidebarSearch" placeholder="Search..." class="form-control sidebar-search mb-2">
 
   <ul class="list-unstyled">
+    <!-- Dashboard -->
     <li class="sidebar-list-item">
       <a class="sidebar-link text-white d-flex align-items-center" href="{{ route('dashboard') }}" role="button" id="dashboardLink" onclick="setActiveLink(this)">
         <i class="fas fa-tachometer-alt me-3"></i><span class="sidebar-link-title">Dashboard</span>
       </a>
     </li>
 
+    <!-- Agent -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('categoryMenu', this); setActiveLink(this)">
-        <i class="fas fa-tags me-3"></i><span class="sidebar-link-title">Agent</span>
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('agentMenu', this); setActiveLink(this)">
+        <i class="fas fa-user-tie me-3"></i><span class="sidebar-link-title">Agent</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
-      <ul id="categoryMenu" class="submenu list-unstyled d-none ps-4">
+      <ul id="agentMenu" class="submenu list-unstyled d-none ps-4">
         <li><a href="{{ route('agents.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Agent</a></li>
         <li><a href="{{ route('agents.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Agent List</a></li>
       </ul>
     </li>
 
-    <!-- Replaced Menu with Products -->
+    <!-- Passport -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('productsMenu', this); setActiveLink(this)">
-        <i class="fas fa-box me-3"></i><span class="sidebar-link-title">Passport</span>
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('passportMenu', this); setActiveLink(this)">
+        <i class="fas fa-passport me-3"></i><span class="sidebar-link-title">Passport</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
-      <ul id="productsMenu" class="submenu list-unstyled d-none ps-4">
+      <ul id="passportMenu" class="submenu list-unstyled d-none ps-4">
         <li><a href="{{ route('passports.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Passport</a></li>
         <li><a href="{{ route('passports.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Passport List</a></li>
       </ul>
     </li>
 
-    <!-- New "Unidt" Sidebar -->
+
+
+    <!-- Employee -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('unitMenu', this); setActiveLink(this)">
-        <i class="fas fa-warehouse me-3"></i><span class="sidebar-link-title">Employee</span>
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('employeeMenu', this); setActiveLink(this)">
+        <i class="fas fa-users me-3"></i><span class="sidebar-link-title">Employee</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
-      <ul id="unitMenu" class="submenu list-unstyled d-none ps-4">
+      <ul id="employeeMenu" class="submenu list-unstyled d-none ps-4">
         <li><a href="{{ route('employees.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Employee</a></li>
-        <li><a href="{{ route('employees.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Employee list</a></li>
+        <li><a href="{{ route('employees.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Employee List</a></li>
+      </ul>
+    </li>
+    <!-- ✅ Category -->
+    <li class="sidebar-list-item">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('categoryMenu', this); setActiveLink(this)">
+        <i class="fas fa-layer-group me-3"></i><span class="sidebar-link-title"> Working Category</span>
+        <i class="fas fa-chevron-right ms-auto"></i>
+      </a>
+      <ul id="categoryMenu" class="submenu list-unstyled d-none ps-4">
+        <li><a href="{{ route('categories.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Category</a></li>
+        <li><a href="{{ route('categories.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Category List</a></li>
+      </ul>
+    </li>
+    <!-- Agencies -->
+    <li class="sidebar-list-item">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('agenciesMenu', this); setActiveLink(this)">
+        <i class="fas fa-building me-3"></i><span class="sidebar-link-title">Agencies</span>
+        <i class="fas fa-chevron-right ms-auto"></i>
+      </a>
+      <ul id="agenciesMenu" class="submenu list-unstyled d-none ps-4">
+        <li><a href="{{ route('agencies.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Agency</a></li>
+        <li><a href="{{ route('agencies.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Agencies List</a></li>
       </ul>
     </li>
 
-
+    <!-- Processing -->
     <li class="sidebar-list-item">
-  <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('sizeMenu', this); setActiveLink(this)">
-    <i class="fas fa-tshirt me-3"></i><span class="sidebar-link-title">Agencies</span>
-    <i class="fas fa-chevron-right ms-auto"></i>
-  </a>
-  <ul id="sizeMenu" class="submenu list-unstyled d-none ps-4">
-    <li><a href="{{ route('agencies.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Agencies</a></li>
-    <li><a href="{{ route('agencies.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Agencies List</a></li>
-  </ul>
-</li>
-
-    <!-- Passport Transit Officer -->
-    <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('transitMenu', this); setActiveLink(this)">
-        <i class="fas fa-people-carry me-3"></i><span class="sidebar-link-title">Passport Officer</span>
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('processingMenu', this); setActiveLink(this)">
+        <i class="fas fa-cogs me-3"></i><span class="sidebar-link-title">Processing</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
-      <ul id="transitMenu" class="submenu list-unstyled d-none ps-4">
+      <ul id="processingMenu" class="submenu list-unstyled d-none ps-4">
+        <li><a href="#" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create Process</a></li>
+        <li><a href="#" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Process List</a></li>
+      </ul>
+    </li>
+
+    <!-- Passport Officer -->
+    <li class="sidebar-list-item">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('officerMenu', this); setActiveLink(this)">
+        <i class="fas fa-user-shield me-3"></i><span class="sidebar-link-title">Passport Officer</span>
+        <i class="fas fa-chevron-right ms-auto"></i>
+      </a>
+      <ul id="officerMenu" class="submenu list-unstyled d-none ps-4">
         <li><a href="{{ route('officers.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Officer</a></li>
         <li><a href="{{ route('officers.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Officer List</a></li>
       </ul>
     </li>
 
-
-    <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" role="button" id="customerListLink" onclick="setActiveLink(this)">
-        <i class="fas fa-users me-3"></i><span class="sidebar-link-title">Customers</span>
-      </a>
-
-    </li>
-    <li class="sidebar-list-item">
-        <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="setActiveLink(this)">
-        <i class="fas fa-hand-holding-usd me-3"></i><span class="sidebar-link-title">Payment Collection</span>
-      </a>
-    </li>
-
-    <li class="sidebar-list-item">
-     <a class="sidebar-link text-white d-flex align-items-center" href="#">
-        <i class="fas fa-envelope me-3"></i><span class="sidebar-link-title">Contacts message </span>
-      </a>
-    </li>
-
-
+    <!-- Report -->
     <li class="sidebar-list-item">
       <a class="sidebar-link text-white d-flex align-items-center" href="#">
-        <i class="fas fa-file-alt me-3"></i><span class="sidebar-link-title">Report</span>
+        <i class="fas fa-chart-bar me-3"></i><span class="sidebar-link-title">Report</span>
       </a>
     </li>
 
+    <!-- Logout -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#">
-        <i class="fas fa-question-circle me-2"></i><span class="sidebar-link-title">Questions</span>
-      </a>
-    </li>
-
-
-    <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#">
-        <i class="fas fa-star me-3"></i><span class="sidebar-link-title">Reviews</span>
-      </a>
-    </li>
-
-    <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#">
+      <a class="sidebar-link text-white d-flex align-items-center" href="{{ route('logout') }}">
         <i class="fas fa-sign-out-alt me-3"></i><span class="sidebar-link-title">Logout</span>
       </a>
     </li>
@@ -128,25 +123,20 @@
   function toggleSubmenu(id, element) {
     const submenu = document.getElementById(id);
     submenu.classList.toggle('d-none');
-
     element.querySelector(".fa-chevron-right").classList.toggle("rotate-icon");
   }
 
   function setActiveLink(link) {
-    // Remove active class from all links
     document.querySelectorAll('.sidebar-link').forEach(function(item) {
       item.classList.remove('active');
     });
-    // Add active class to the clicked link
     link.classList.add('active');
   }
 
   function setActiveSubmenuLink(link) {
-    // Remove active class from all submenu links
     document.querySelectorAll('.submenu .sidebar-link').forEach(function(item) {
       item.classList.remove('active');
     });
-    // Add active class to the clicked submenu link
     link.classList.add('active');
   }
 </script>
@@ -159,10 +149,7 @@
     padding: 15px;
     border-radius: 10px;
   }
-
-  .sidebar-list-item {
-    margin-bottom: 10px;
-  }
+  .sidebar-list-item { margin-bottom: 10px; }
 
   .sidebar-link {
     display: flex;
@@ -172,27 +159,10 @@
     transition: background 0.3s;
     color: white;
   }
+  .sidebar-link:hover { background: #34495e; color: white; }
+  .sidebar-link.active { background: #16a085; color: white; }
 
-  .sidebar-link:hover {
-    background: #34495e;
-    color: white;
-  }
-
-  .sidebar-link.active {
-    background: #16a085;
-    /* Highlight color for active link */
-    color: white;
-  }
-
-  .submenu {
-    padding-left: 20px;
-  }
-
-  .fa-chevron-right {
-    transition: transform 0.3s;
-  }
-
-  .rotate-icon {
-    transform: rotate(90deg);
-  }
+  .submenu { padding-left: 20px; }
+  .fa-chevron-right { transition: transform 0.3s; }
+  .rotate-icon { transform: rotate(90deg); }
 </style>

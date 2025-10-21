@@ -17,6 +17,26 @@
   <form action="{{ route('agencies.store') }}" method="POST">
     @csrf
     <div class="row g-3">
+
+      {{-- Category --}}
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Category</label>
+        <div class="d-flex gap-2">
+          <select name="category_id" class="form-select">
+            <option value="">-- Select Category --</option>
+            @foreach ($categories as $cat)
+              <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>
+                {{ $cat->name }}
+              </option>
+            @endforeach
+          </select>
+          <a href="{{ route('categories.create') }}" class="btn btn-outline-light border">
+            + New
+          </a>
+        </div>
+        @error('category_id') <small class="text-danger">{{ $message }}</small> @enderror
+      </div>
+
       <div class="col-md-6">
         <label class="form-label fw-semibold">Agency Name <span class="text-danger">*</span></label>
         <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>

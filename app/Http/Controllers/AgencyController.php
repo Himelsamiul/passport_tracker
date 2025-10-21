@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agency;
 use Illuminate\Http\Request;
-
+use App\Models\Category;
 class AgencyController extends Controller
 {
     // LIST
@@ -16,71 +16,59 @@ class AgencyController extends Controller
 
     // CREATE FORM
     public function create()
-    {
-        return view('backend.pages.agencies.create');
-    }
+{
+    // Only active categories in dropdown (change if you want all)
+    $categories = Category::where('status', 'active')
+                    ->orderBy('name')
+                    ->get(['id','name']);
+    return view('backend.pages.agencies.create', compact('categories'));
+}
 
-    // STORE
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'           => ['required','string','max:255','unique:agencies,name'],
-            'contact_person' => ['nullable','string','max:255'],
-            'phone'          => ['nullable','string','max:30'],
-            'email'          => ['nullable','email','max:255'],
-            'address'        => ['nullable','string','max:500'],
-            'status'         => ['nullable','in:ACTIVE,INACTIVE'],
-            'notes'          => ['nullable','string','max:1000'],
-        ]);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'category_id'    => 'nullable|exists:categories,id', // use 'required' if you want it mandatory
+        'name'           => 'required|string|max:255',
+        'contact_person' => 'nullable|string|max:255',
+        'phone'          => 'nullable|string|max:50',
+        'email'          => 'nullable|email|max:255',
+        'address'        => 'nullable|string|max:2000',
+        'status'         => 'required|in:ACTIVE,INACTIVE',
+        'notes'          => 'nullable|string|max:2000',
+    ]);
 
-        Agency::create([
-            'name'           => $request->name,
-            'contact_person' => $request->contact_person,
-            'phone'          => $request->phone,
-            'email'          => $request->email,
-            'address'        => $request->address,
-            'status'         => $request->status ?? 'ACTIVE',
-            'notes'          => $request->notes,
-        ]);
+    Agency::create($validated);
 
-        return redirect()->route('agencies.index')->with('success', 'Agency created successfully.');
-    }
+    return redirect()->route('agencies.index')->with('success','Agency created successfully.');
+}
 
-    // EDIT FORM
-    public function edit($id)
-    {
-        $agency = Agency::findOrFail($id);
-        return view('backend.pages.agencies.edit', compact('agency'));
-    }
+public function edit($id)
+{
+    $agency = Agency::findOrFail($id);
+    $categories = Category::where('status', 'active')
+                    ->orderBy('name')
+                    ->get(['id','name']);
+    return view('backend.pages.agencies.edit', compact('agency','categories'));
+}
 
-    // UPDATE
-    public function update(Request $request, $id)
-    {
-        $agency = Agency::findOrFail($id);
+public function update(Request $request, $id)
+{
+    $validated = $request->validate([
+        'category_id'    => 'nullable|exists:categories,id', // or 'required'
+        'name'           => 'required|string|max:255',
+        'contact_person' => 'nullable|string|max:255',
+        'phone'          => 'nullable|string|max:50',
+        'email'          => 'nullable|email|max:255',
+        'address'        => 'nullable|string|max:2000',
+        'status'         => 'required|in:ACTIVE,INACTIVE',
+        'notes'          => 'nullable|string|max:2000',
+    ]);
 
-        $request->validate([
-            'name'           => ['required','string','max:255','unique:agencies,name,'.$agency->id],
-            'contact_person' => ['nullable','string','max:255'],
-            'phone'          => ['nullable','string','max:30'],
-            'email'          => ['nullable','email','max:255'],
-            'address'        => ['nullable','string','max:500'],
-            'status'         => ['nullable','in:ACTIVE,INACTIVE'],
-            'notes'          => ['nullable','string','max:1000'],
-        ]);
+    $agency = Agency::findOrFail($id);
+    $agency->update($validated);
 
-        $agency->update([
-            'name'           => $request->name,
-            'contact_person' => $request->contact_person,
-            'phone'          => $request->phone,
-            'email'          => $request->email,
-            'address'        => $request->address,
-            'status'         => $request->status ?? 'ACTIVE',
-            'notes'          => $request->notes,
-        ]);
-
-        return redirect()->route('agencies.index')->with('success', 'Agency updated successfully.');
-    }
-
+    return redirect()->route('agencies.index')->with('success','Agency updated successfully.');
+}
     // DELETE
     public function destroy($id)
     {

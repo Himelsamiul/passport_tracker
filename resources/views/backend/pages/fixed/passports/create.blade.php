@@ -29,6 +29,17 @@
         </select>
       </div>
 
+      <!-- Passport Officer (NEW) -->
+      <div class="col-md-4">
+        <label class="form-label">Passport Officer</label>
+        <select name="passport_officer_id" class="form-select">
+          <option value="">— Select Officer —</option>
+          @foreach($officers as $o)
+            <option value="{{ $o->id }}" @selected(old('passport_officer_id')==$o->id)>{{ $o->name }}</option>
+          @endforeach
+        </select>
+      </div>
+
       <!-- Passport Received By -->
       <div class="col-md-4">
         <label class="form-label">Passport Received By <span class="text-danger">*</span></label>
@@ -99,6 +110,12 @@
         <label class="form-label">Passport Picture</label>
         <input type="file" name="passport_picture" class="form-control" accept="image/*">
         <small class="text-muted">Max 2MB. JPG/PNG/WebP.</small>
+      </div>
+
+      <!-- Notes (NEW) -->
+      <div class="col-12">
+        <label class="form-label">Notes</label>
+        <textarea name="notes" rows="2" class="form-control">{{ old('notes') }}</textarea>
       </div>
     </div>
 

@@ -11,7 +11,8 @@ class Passport extends Model
 
     protected $fillable = [
         'agent_id',
-        'employee_id',           // ⬅️ add this
+        'passport_officer_id',   // NEW
+        'employee_id',
         'applicant_name',
         'address',
         'phone',
@@ -22,6 +23,7 @@ class Passport extends Model
         'issue_date',
         'expiry_date',
         'nid_number',
+        'notes',                 // NEW
         'status',
     ];
 
@@ -31,14 +33,21 @@ class Passport extends Model
         'expiry_date'   => 'date',
     ];
 
+    // Relations
     public function agent()
     {
         return $this->belongsTo(Agent::class);
     }
 
-    // ⬅️ NEW: which employee received the passport
+    // Which employee received the passport
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    // The “middle person”/officer
+    public function passportOfficer()
+    {
+        return $this->belongsTo(PassportOfficer::class);
     }
 }

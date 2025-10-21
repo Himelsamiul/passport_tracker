@@ -7,9 +7,17 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\PassportOfficerController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 
-// -------- Dashboard --------
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/login',  [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// PROTECTED
+Route::middleware(['auth.session'])->group(function () {
+    // -------- Dashboard --------
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 // -------- Agents CRUD --------
 Route::get('/agents', [AgentController::class, 'index'])->name('agents.index');       // list
@@ -26,6 +34,8 @@ Route::post('/passports/store', [PassportController::class, 'store'])->name('pas
 Route::get('/passports/edit/{id}', [PassportController::class, 'edit'])->name('passports.edit');  // edit form
 Route::post('/passports/update/{id}', [PassportController::class, 'update'])->name('passports.update'); // update
 Route::get('/passports/delete/{id}', [PassportController::class, 'destroy'])->name('passports.delete'); // delete
+Route::get('/passports/show/{id}', [PassportController::class, 'show'])->name('passports.show');
+
 
 // -------- Employees CRUD --------
 // -------- Employees CRUD --------
@@ -51,3 +61,12 @@ Route::post('/officers/store',        [PassportOfficerController::class, 'store'
 Route::get('/officers/edit/{id}',     [PassportOfficerController::class, 'edit'])->name('officers.edit');
 Route::post('/officers/update/{id}',  [PassportOfficerController::class, 'update'])->name('officers.update');
 Route::get('/officers/delete/{id}',   [PassportOfficerController::class, 'destroy'])->name('officers.delete');
+
+// -------- Categories CRUD --------
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');
+Route::get('/categories/edit/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
+Route::post('/categories/update/{id}', [CategoryController::class, 'update'])->name('categories.update');
+Route::get('/categories/delete/{id}', [CategoryController::class, 'destroy'])->name('categories.delete');
+});
