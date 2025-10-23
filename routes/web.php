@@ -10,6 +10,7 @@ use App\Http\Controllers\PassportOfficerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PassportProcessingController;  
+use App\Http\Controllers\PassportCollectionController;
 
 Route::get('/login',  [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -83,4 +84,25 @@ Route::delete('/processings/{processing}', [PassportProcessingController::class,
 // AJAX to load full Add Passport content into the form
 Route::get('/processings/passport-details/{passport}', [PassportProcessingController::class, 'passportDetails'])
     ->name('processings.passport.details');
+
+
+Route::prefix('passport-collections')->name('collections.')->group(function () {
+    Route::get('/', [PassportCollectionController::class, 'index'])->name('index');
+    Route::get('/create', [PassportCollectionController::class, 'create'])->name('create');
+    Route::post('/store', [PassportCollectionController::class, 'store'])->name('store');
+
+    // ✅ Put AJAX before {id} OR constrain {id} to numbers
+    Route::get('/passport/{passport}', [PassportCollectionController::class, 'passportInfo'])
+        ->name('passport.info');
+
+    Route::get('/{id}', [PassportCollectionController::class, 'show'])
+        ->whereNumber('id')                           // ✅ numeric only
+        ->name('show');
+            // 👁️ View (details)
+
+    // 🗑️ Delete (add it AFTER show)
+    Route::delete('/{id}', [PassportCollectionController::class, 'destroy'])
+        ->whereNumber('id') // optional but safer
+        ->name('destroy');
+});
 });

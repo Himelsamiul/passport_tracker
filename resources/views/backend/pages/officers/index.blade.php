@@ -11,9 +11,12 @@
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
+  @if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+  @endif
 
   <div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
+    <table class="table table-bordered table-striped align-middle text-center">
       <thead class="table-dark">
         <tr>
           <th>#</th>
@@ -28,18 +31,45 @@
       </thead>
       <tbody>
         @forelse($officers as $i => $o)
-          <tr>
+          @php
+            // ✅ Check if this officer is used in any passport
+            $isUsed = \App\Models\Passport::where('passport_officer_id', $o->id)->exists();
+          @endphp
+
+          <tr @if($isUsed) style="background-color:#f8f9fa;" @endif>
             <td>{{ $i+1 }}</td>
             <td>{{ $o->name }}</td>
             <td>{{ $o->phone }}</td>
             <td>{{ $o->email }}</td>
             <td>{{ $o->address }}</td>
-            <td><span class="badge {{ $o->status === 'ACTIVE' ? 'bg-success' : 'bg-secondary' }}">{{ $o->status }}</span></td>
+            <td>
+              <span class="badge {{ $o->status === 'ACTIVE' ? 'bg-success' : 'bg-secondary' }}">
+                {{ $o->status }}
+              </span>
+            </td>
             <td>{{ $o->notes }}</td>
             <td class="nowrap">
-              <a href="{{ route('officers.edit', $o->id) }}" class="btn btn-sm btn-warning">Edit</a>
-              <a href="{{ route('officers.delete', $o->id) }}" class="btn btn-sm btn-danger"
-                 onclick="return confirm('Delete this officer?')">Delete</a>
+              <a href="{{ route('officers.edit', $o->id) }}" class="btn btn-sm btn-warning">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+
+              @if($isUsed)
+                {{-- 🔒 Locked button if officer is in use --}}
+                <button type="button" 
+                        class="btn btn-sm btn-secondary"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="You can’t delete this officer — they are already assigned to a passport.">
+                  <i class="fas fa-lock"></i> Locked
+                </button>
+              @else
+                {{-- 🗑️ Delete button (safe to delete) --}}
+                <a href="{{ route('officers.delete', $o->id) }}" 
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Are you sure you want to delete this officer?')">
+                  <i class="fas fa-trash-alt"></i> Delete
+                </a>
+              @endif
             </td>
           </tr>
         @empty
@@ -49,4 +79,17 @@
     </table>
   </div>
 </div>
+
+
+@push('scripts')
+<script>
+  // ✅ Enable Bootstrap tooltip globally
+  document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  });
+</script>
+@endpush
 @endsection

@@ -193,7 +193,18 @@ public function update(\Illuminate\Http\Request $request, PassportProcessing $pr
 
 public function destroy(PassportProcessing $processing)
 {
+    $passportId = $processing->passport_id;
+
+    // Delete processing
     $processing->delete();
-    return redirect()->route('processings.index')->with('success','Processing deleted.');
+
+    // Revert the passport status so it becomes available again
+    \App\Models\Passport::where('id', $passportId)->update([
+        'status' => 'RECEIVED_FROM_AGENT' // 👈 same status you use for available passports
+    ]);
+
+    return redirect()
+        ->route('processings.index')
+        ->with('success', 'Processing deleted and passport is now available again.');
 }
 }

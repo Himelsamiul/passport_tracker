@@ -3,7 +3,7 @@
 @section('content')
 <style>
   .table-scroll { max-height: 70vh; overflow: auto; border: 1px solid #dee2e6; border-radius: .5rem; }
-  .table-scroll table { width: max-content; min-width: 1100px; table-layout: auto; margin-bottom: 0; font-size: 13px; }
+  .table-scroll table { width: max-content; min-width: 1200px; table-layout: auto; margin-bottom: 0; font-size: 13px; }
   th, td { white-space: nowrap; vertical-align: middle; padding: 6px 10px; line-height: 1.3; }
   thead th { position: sticky; top: 0; z-index: 3; background: #212529 !important; color: #fff !important; }
   .badge { font-size: 12px; padding: 4px 8px; }
@@ -59,9 +59,6 @@
             @foreach($agencies as $a)
               <option value="{{ $a->id }}" @selected($agencyId == $a->id)>{{ $a->name }}</option>
             @endforeach
-            {{-- If you want a filter to see rows without agency, uncomment:
-            <option value="__NULL__" @selected($agencyId === '__NULL__')>Unassigned</option>
-            --}}
           </select>
         </div>
 
@@ -99,44 +96,83 @@
           <th style="min-width:180px;">Applicant</th>
           <th style="min-width:180px;">Employee (Picked Up)</th>
           <th style="min-width:180px;">Agency</th>
-          <th style="min-width:130px;">Status</th>
+          <th style="min-width:130px;">Processing Status</th>
+          <th style="min-width:150px;">Collection Status</th>
           <th style="min-width:170px;">Created</th>
           <th style="min-width:220px;">Actions</th>
         </tr>
       </thead>
       <tbody>
         @forelse($processings as $i => $proc)
-          <tr>
+          @php
+            // Has this passport been collected?
+            $collected = \App\Models\PassportCollection::where('passport_id', $proc->passport_id)->exists();
+
+            // Processing badge
+            $procBadge = match($proc->status) {
+              'DONE'        => 'bg-success',
+              'IN_PROGRESS' => 'bg-warning text-dark',
+              'PENDING'     => 'bg-secondary',
+              'REJECTED'    => 'bg-danger',
+              default       => 'bg-secondary'
+            };
+
+            // Collection badge
+            $collectBadge = $collected ? 'bg-success' : 'bg-dark';
+            $collectText  = $collected 
+                ? 'Collected from '.($proc->agency->name ?? 'Agency') 
+                : 'Not Collected';
+          @endphp
+
+          <tr @if($collected) style="background-color:#f8f9fa;" @endif>
             <td>{{ ($processings->currentPage()-1)*$processings->perPage() + $i + 1 }}</td>
             <td>{{ $proc->passport->passport_number ?? '—' }}</td>
             <td>{{ $proc->passport->applicant_name ?? '—' }}</td>
             <td>{{ $proc->employee->name ?? '—' }}</td>
             <td>{{ $proc->agency->name ?? 'Unassigned' }}</td>
+
+            {{-- Processing Status --}}
             <td>
-              @php
-                $map = [
-                  'DONE' => 'bg-success',
-                  'IN_PROGRESS' => 'bg-warning text-dark',
-                  'PENDING' => 'bg-secondary',
-                  'REJECTED' => 'bg-danger'
-                ];
-                $cls = $map[$proc->status] ?? 'bg-secondary';
-              @endphp
-              <span class="badge {{ $cls }}">{{ $proc->status }}</span>
+              <span class="badge {{ $procBadge }}">{{ $proc->status }}</span>
             </td>
-            <td>{{ $proc->created_at->format('d M Y, h:i A') }}</td>
+
+            {{-- Collection Status --}}
             <td>
-              <a href="{{ route('processings.show', $proc->id) }}" class="btn btn-sm btn-info">View</a>
-              <a href="{{ route('processings.edit', $proc->id) }}" class="btn btn-sm btn-warning">Edit</a>
-              <form action="{{ route('processings.destroy', $proc->id) }}" method="POST" class="d-inline">
-                @csrf @method('DELETE')
-                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this record?')">Delete</button>
-              </form>
+              <span class="badge {{ $collectBadge }}">{{ $collectText }}</span>
+            </td>
+
+            <td>{{ $proc->created_at->format('d M Y, h:i A') }}</td>
+
+            <td>
+              <div class="d-flex justify-content-center gap-1 flex-wrap">
+                <a href="{{ route('processings.show', $proc->id) }}" class="btn btn-sm btn-info">
+                  <i class="fas fa-eye"></i> View
+                </a>
+                <a href="{{ route('processings.edit', $proc->id) }}" class="btn btn-sm btn-warning">
+                  <i class="fas fa-edit"></i> Edit
+                </a>
+
+                @if($collected)
+                  {{-- 🔒 Locked delete --}}
+                  <button type="button" class="btn btn-sm btn-secondary"
+                          data-bs-toggle="tooltip"
+                          title="You can’t delete this processing — the passport has already been collected.">
+                    <i class="fas fa-lock"></i> Locked
+                  </button>
+                @else
+                  <form action="{{ route('processings.destroy', $proc->id) }}" method="POST" class="d-inline">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this record?')">
+                      <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                  </form>
+                @endif
+              </div>
             </td>
           </tr>
         @empty
           <tr>
-            <td colspan="8" class="text-muted">No processing records found.</td>
+            <td colspan="9" class="text-muted">No processing records found.</td>
           </tr>
         @endforelse
       </tbody>
@@ -151,3 +187,15 @@
   <p class="mt-2 text-muted" style="font-size:13px;">👉 Scroll left or right to view the full table.</p>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  // Enable Bootstrap tooltips
+  document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  });
+</script>
+@endpush

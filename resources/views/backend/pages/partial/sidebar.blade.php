@@ -13,7 +13,8 @@
 
     <!-- Agent -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('agentMenu', this); setActiveLink(this)">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('agentMenu', this); setActiveLink(this)">
         <i class="fas fa-user-tie me-3"></i><span class="sidebar-link-title">Agent</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
@@ -25,7 +26,8 @@
 
     <!-- Passport -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('passportMenu', this); setActiveLink(this)">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('passportMenu', this); setActiveLink(this)">
         <i class="fas fa-passport me-3"></i><span class="sidebar-link-title">Passport</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
@@ -35,11 +37,10 @@
       </ul>
     </li>
 
-
-
     <!-- Employee -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('employeeMenu', this); setActiveLink(this)">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('employeeMenu', this); setActiveLink(this)">
         <i class="fas fa-users me-3"></i><span class="sidebar-link-title">Employee</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
@@ -48,10 +49,12 @@
         <li><a href="{{ route('employees.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Employee List</a></li>
       </ul>
     </li>
-    <!-- ✅ Category -->
+
+    <!-- Working Category -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('categoryMenu', this); setActiveLink(this)">
-        <i class="fas fa-layer-group me-3"></i><span class="sidebar-link-title"> Working Category</span>
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('categoryMenu', this); setActiveLink(this)">
+        <i class="fas fa-layer-group me-3"></i><span class="sidebar-link-title">Working Category</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
       <ul id="categoryMenu" class="submenu list-unstyled d-none ps-4">
@@ -59,9 +62,11 @@
         <li><a href="{{ route('categories.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Category List</a></li>
       </ul>
     </li>
+
     <!-- Agencies -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('agenciesMenu', this); setActiveLink(this)">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('agenciesMenu', this); setActiveLink(this)">
         <i class="fas fa-building me-3"></i><span class="sidebar-link-title">Agencies</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
@@ -73,7 +78,8 @@
 
     <!-- Processing -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('processingMenu', this); setActiveLink(this)">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('processingMenu', this); setActiveLink(this)">
         <i class="fas fa-cogs me-3"></i><span class="sidebar-link-title">Processing</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
@@ -85,13 +91,27 @@
 
     <!-- Passport Officer -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#" onclick="toggleSubmenu('officerMenu', this); setActiveLink(this)">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('officerMenu', this); setActiveLink(this)">
         <i class="fas fa-user-shield me-3"></i><span class="sidebar-link-title">Passport Officer</span>
         <i class="fas fa-chevron-right ms-auto"></i>
       </a>
       <ul id="officerMenu" class="submenu list-unstyled d-none ps-4">
         <li><a href="{{ route('officers.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Add Officer</a></li>
         <li><a href="{{ route('officers.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Officer List</a></li>
+      </ul>
+    </li>
+
+    <!-- ✅ Passport Collections (unique id!) -->
+    <li class="sidebar-list-item">
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('collectionsMenu', this); setActiveLink(this)">
+        <i class="fas fa-briefcase me-3"></i><span class="sidebar-link-title">Passport Collections</span>
+        <i class="fas fa-chevron-right ms-auto"></i>
+      </a>
+      <ul id="collectionsMenu" class="submenu list-unstyled d-none ps-4">
+        <li><a href="{{ route('collections.create') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">Create</a></li>
+        <li><a href="{{ route('collections.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">List</a></li>
       </ul>
     </li>
 
@@ -112,34 +132,52 @@
 </div>
 
 <script>
+  // Sidebar search
   document.getElementById('sidebarSearch').addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase();
+    const term = this.value.toLowerCase();
     document.querySelectorAll('.sidebar-list-item').forEach(function(item) {
       const text = item.textContent.toLowerCase();
-      item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+      item.style.display = text.includes(term) ? 'block' : 'none';
     });
   });
 
-  function toggleSubmenu(id, element) {
+  // ✅ Unified toggleSubmenu (prevents jump for all)
+  function toggleSubmenu(eventOrId, maybeElement, maybeLink) {
+    let event = null, id, element;
+
+    // handle both call styles
+    if (typeof eventOrId === 'string') {
+      id = eventOrId;
+      element = maybeElement;
+    } else {
+      event = eventOrId;
+      id = maybeElement;
+      element = maybeLink;
+    }
+
+    // prevent the '#' anchor jump
+    if (event) event.preventDefault();
+
     const submenu = document.getElementById(id);
+    if (!submenu) return;
+
     submenu.classList.toggle('d-none');
-    element.querySelector(".fa-chevron-right").classList.toggle("rotate-icon");
+
+    const chevron = element.querySelector('.fa-chevron-right');
+    if (chevron) chevron.classList.toggle('rotate-icon');
   }
 
   function setActiveLink(link) {
-    document.querySelectorAll('.sidebar-link').forEach(function(item) {
-      item.classList.remove('active');
-    });
+    document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
     link.classList.add('active');
   }
 
   function setActiveSubmenuLink(link) {
-    document.querySelectorAll('.submenu .sidebar-link').forEach(function(item) {
-      item.classList.remove('active');
-    });
+    document.querySelectorAll('.submenu .sidebar-link').forEach(item => item.classList.remove('active'));
     link.classList.add('active');
   }
 </script>
+
 
 <style>
   .sidebar {
@@ -158,6 +196,7 @@
     border-radius: 5px;
     transition: background 0.3s;
     color: white;
+    text-decoration: none;
   }
   .sidebar-link:hover { background: #34495e; color: white; }
   .sidebar-link.active { background: #16a085; color: white; }

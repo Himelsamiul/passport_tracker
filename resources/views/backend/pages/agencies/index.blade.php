@@ -17,14 +17,13 @@
     min-width: 1100px;
     table-layout: auto;
     margin-bottom: 0;
-    font-size: 13px;           /* smaller text */
+    font-size: 13px;
   }
 
-  /* COMPACT CELLS */
   th, td {
     white-space: nowrap;
     vertical-align: middle;
-    padding: 6px 10px;          /* smaller padding */
+    padding: 6px 10px;
     line-height: 1.3;
   }
 
@@ -36,11 +35,9 @@
     color: #fff;
   }
 
-  /* SMALL BADGES & BUTTONS */
   .badge { font-size: 12px; padding: 4px 8px; }
   .btn-sm { font-size: 12px; padding: 3px 8px; margin: 1px; }
 
-  /* Column widths */
   .col-idx { min-width: 50px; text-align:center; }
   .col-name { min-width: 150px; }
   .col-cat { min-width: 120px; }
@@ -53,7 +50,6 @@
   .col-datetime { min-width: 150px; }
   .col-actions { min-width: 200px; white-space: nowrap; }
 
-  /* HINT TEXT STYLE */
   .scroll-hint {
     font-size: 13px;
     font-style: italic;
@@ -73,7 +69,6 @@
     <div class="alert alert-success py-2 px-3">{{ session('success') }}</div>
   @endif
 
-  <!-- 👇 SCROLL TEXT HINT -->
   <p class="scroll-hint">👉 Scroll left or right to view the full table.</p>
 
   <div class="table-scroll">
@@ -95,7 +90,12 @@
       </thead>
       <tbody>
         @forelse($agencies as $key => $agency)
-          <tr>
+          @php
+            // ✅ Check if agency is already used in any processing
+            $isUsed = \App\Models\PassportProcessing::where('agency_id', $agency->id)->exists();
+          @endphp
+
+          <tr @if($isUsed) style="background-color:#f8f9fa;" @endif>
             <td>{{ $key + 1 }}</td>
             <td>{{ $agency->name }}</td>
             <td>{{ $agency->category->name ?? 'N/A' }}</td>
@@ -111,10 +111,27 @@
             <td>{{ $agency->notes }}</td>
             <td>{{ $agency->created_at->format('d M Y, h:i A') }}</td>
             <td>
-             
-              <a href="{{ route('agencies.edit', $agency->id) }}" class="btn btn-sm btn-warning">Edit</a>
-              <a href="{{ route('agencies.delete', $agency->id) }}" class="btn btn-sm btn-danger"
-                 onclick="return confirm('Are you sure you want to delete this agency?')">Delete</a>
+              <a href="{{ route('agencies.edit', $agency->id) }}" class="btn btn-sm btn-warning">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+
+              @if($isUsed)
+                {{-- 🔒 Locked (agency in use in processing) --}}
+                <button type="button"
+                        class="btn btn-sm btn-secondary"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="You can’t delete this agency — it’s already used in a processing.">
+                  <i class="fas fa-lock"></i> Locked
+                </button>
+              @else
+                {{-- 🗑️ Delete (safe to delete) --}}
+                <a href="{{ route('agencies.delete', $agency->id) }}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Are you sure you want to delete this agency?')">
+                  <i class="fas fa-trash-alt"></i> Delete
+                </a>
+              @endif
             </td>
           </tr>
         @empty
@@ -126,4 +143,17 @@
     </table>
   </div>
 </div>
+
+
+@push('scripts')
+<script>
+  // ✅ Enable tooltips
+  document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  });
+</script>
+@endpush
 @endsection
