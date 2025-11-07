@@ -30,6 +30,15 @@ Route::get('/agents/edit/{id}', [AgentController::class, 'edit'])->name('agents.
 Route::post('/agents/update/{id}', [AgentController::class, 'update'])->name('agents.update'); // update
 Route::get('/agents/delete/{id}', [AgentController::class, 'destroy'])->name('agents.delete'); // delete
 
+
+// In-app registration (uses AuthController)
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register.form');
+Route::post('/register', [AuthController::class, 'registerStore'])->name('register.store');
+Route::get('/register/list', [AuthController::class, 'registerList'])->name('register.list');
+Route::patch('/register/{id}/status', [AuthController::class, 'registerToggleStatus'])->name('register.status');
+Route::delete('/register/{id}',    [AuthController::class, 'registerDestroy'])->name('register.destroy');
+
+
 // -------- Passports CRUD --------
 Route::get('/passports', [PassportController::class, 'index'])->name('passports.index');       // list
 Route::get('/passports/create', [PassportController::class, 'create'])->name('passports.create'); // add form

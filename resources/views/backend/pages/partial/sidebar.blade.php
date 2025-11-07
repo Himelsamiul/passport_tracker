@@ -116,6 +116,27 @@
         <li><a href="{{ route('collections.index') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">List</a></li>
       </ul>
     </li>
+<!-- Registration (submenu) -->
+<li class="sidebar-list-item">
+  <a class="sidebar-link text-white d-flex align-items-center" href="#"
+     onclick="toggleSubmenu('registrationMenu', this); setActiveLink(this)">
+    <i class="fas fa-user-plus me-3"></i>
+    <span class="sidebar-link-title">Registration</span>
+    <i class="fas fa-chevron-right ms-auto"></i>
+  </a>
+  <ul id="registrationMenu" class="submenu list-unstyled d-none ps-4">
+    <li>
+      <a href="{{ route('register.form') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">
+        Create
+      </a>
+    </li>
+    <li>
+      <a href="{{ route('register.list') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">
+        List
+      </a>
+    </li>
+  </ul>
+</li>
 
     <!-- ✅ Reports Section -->
     <li class="sidebar-list-item">
