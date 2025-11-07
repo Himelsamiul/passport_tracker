@@ -1,5 +1,7 @@
 <div class="sidebar py-3" id="sidebar">
-  <button onclick="toggleSidebar()" class="btn btn-outline-light mb-3 w-100 text-white border-0" style="background: transparent;">Toggle Sidebar</button>
+  <button onclick="toggleSidebar()" class="btn btn-outline-light mb-3 w-100 text-white border-0" style="background: transparent;">
+    Toggle Sidebar
+  </button>
 
   <input type="text" id="sidebarSearch" placeholder="Search..." class="form-control sidebar-search mb-2">
 
@@ -102,7 +104,7 @@
       </ul>
     </li>
 
-    <!-- ✅ Passport Collections (unique id!) -->
+    <!-- Passport Collections -->
     <li class="sidebar-list-item">
       <a class="sidebar-link text-white d-flex align-items-center" href="#"
          onclick="toggleSubmenu('collectionsMenu', this); setActiveLink(this)">
@@ -115,11 +117,30 @@
       </ul>
     </li>
 
-    <!-- Report -->
+    <!-- ✅ Reports Section -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#">
-        <i class="fas fa-chart-bar me-3"></i><span class="sidebar-link-title">Report</span>
+      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+         onclick="toggleSubmenu('reportsMenu', this); setActiveLink(this)">
+        <i class="fas fa-chart-bar me-3"></i><span class="sidebar-link-title">Reports</span>
+        <i class="fas fa-chevron-right ms-auto"></i>
       </a>
+      <ul id="reportsMenu" class="submenu list-unstyled d-none ps-4">
+        <li>
+          <a href="{{ route('reports.processing') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">
+            <i class="fas fa-tasks me-2"></i> Processing Report
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('reports.collection') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">
+            <i class="fas fa-box-open me-2"></i> Collection Report
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('reports.summary') }}" class="sidebar-link text-white" onclick="setActiveSubmenuLink(this)">
+            <i class="fas fa-chart-pie me-2"></i> Summary Report
+          </a>
+        </li>
+      </ul>
     </li>
 
     <!-- Logout -->
@@ -141,28 +162,10 @@
     });
   });
 
-  // ✅ Unified toggleSubmenu (prevents jump for all)
-  function toggleSubmenu(eventOrId, maybeElement, maybeLink) {
-    let event = null, id, element;
-
-    // handle both call styles
-    if (typeof eventOrId === 'string') {
-      id = eventOrId;
-      element = maybeElement;
-    } else {
-      event = eventOrId;
-      id = maybeElement;
-      element = maybeLink;
-    }
-
-    // prevent the '#' anchor jump
-    if (event) event.preventDefault();
-
+  function toggleSubmenu(id, element) {
     const submenu = document.getElementById(id);
     if (!submenu) return;
-
     submenu.classList.toggle('d-none');
-
     const chevron = element.querySelector('.fa-chevron-right');
     if (chevron) chevron.classList.toggle('rotate-icon');
   }
@@ -177,7 +180,6 @@
     link.classList.add('active');
   }
 </script>
-
 
 <style>
   .sidebar {
@@ -204,4 +206,13 @@
   .submenu { padding-left: 20px; }
   .fa-chevron-right { transition: transform 0.3s; }
   .rotate-icon { transform: rotate(90deg); }
+
+  .sidebar-search {
+    background: #34495e;
+    color: white;
+    border: none;
+  }
+  .sidebar-search::placeholder {
+    color: #ccc;
+  }
 </style>

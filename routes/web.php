@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PassportProcessingController;  
 use App\Http\Controllers\PassportCollectionController;
+use App\Http\Controllers\ReportsController;
 
 Route::get('/login',  [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -105,4 +106,9 @@ Route::prefix('passport-collections')->name('collections.')->group(function () {
         ->whereNumber('id') // optional but safer
         ->name('destroy');
 });
+Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/processing', [ReportsController::class, 'processing'])->name('processing');
+        Route::get('/collection', [ReportsController::class, 'collection'])->name('collection');
+        Route::get('/summary',    [ReportsController::class, 'summary'])->name('summary');
+    });
 });

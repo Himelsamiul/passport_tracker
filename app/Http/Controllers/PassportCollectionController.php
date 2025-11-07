@@ -12,25 +12,80 @@ use Illuminate\Support\Facades\DB;
 class PassportCollectionController extends Controller
 {
     // List of collections
-public function index()
+public function index(Request $request)
 {
-    $collections = \App\Models\PassportCollection::with([
-        'passport.agent',
-        'passport.processings.agency', // ✅ load agency name from processing
-        'employee'
-    ])->latest()->paginate(20);
+    $status     = strtoupper((string)$request->status);
+    $employeeId = $request->employee_id;
+    $agencyId   = $request->agency_id;
+    $search     = trim($request->q ?? '');
+    $dateFrom   = $request->date_from;
+    $dateTo     = $request->date_to;
+    $sortBy     = $request->sort_by ?? 'latest';
+    $perPage    = (int)($request->per_page ?? 20);
 
-    return view('backend.pages.collections.index', compact('collections'));
+    $q = PassportCollection::with(['passport.agent','passport.processings.agency','employee']);
+
+    if ($search !== '') {
+        $q->whereHas('passport', function($qq) use ($search) {
+            $qq->where('passport_number','like',"%{$search}%")
+               ->orWhere('applicant_name','like',"%{$search}%");
+        });
+    }
+
+    if ($status) {
+        // filter by latest processing status on that passport
+        $q->whereHas('passport.processings', function($qq) use ($status) {
+            $qq->where('status', $status);
+        });
+    }
+
+    if ($employeeId) $q->where('employee_id', $employeeId);
+
+    if ($agencyId) {
+        $q->whereHas('passport.processings', function($qq) use ($agencyId) {
+            $qq->where('agency_id', $agencyId);
+        });
+    }
+
+    if ($dateFrom && $dateTo) {
+        $q->whereBetween('collected_at', [$dateFrom.' 00:00:00', $dateTo.' 23:59:59']);
+    } elseif ($dateFrom) {
+        $q->where('collected_at', '>=', $dateFrom.' 00:00:00');
+    } elseif ($dateTo) {
+        $q->where('collected_at', '<=', $dateTo.' 23:59:59');
+    }
+
+    // sorting
+    switch ($sortBy) {
+        case 'oldest':  $q->oldest('id'); break;
+        case 'name_az': $q->whereHas('passport', fn($qq)=>$qq->orderBy('applicant_name','asc')); break;
+        case 'name_za': $q->whereHas('passport', fn($qq)=>$qq->orderBy('applicant_name','desc')); break;
+        default:        $q->latest('id'); // latest
+    }
+
+    $collections = $q->paginate($perPage)->withQueryString();
+
+    // lists for filters
+    $employees = Employee::orderBy('name')->get(['id','name']);
+    $agencies  = \App\Models\Agency::orderBy('name')->get(['id','name']);
+
+    return view('backend.pages.collections.index', compact(
+        'collections','employees','agencies',
+        'search','status','employeeId','agencyId','dateFrom','dateTo','perPage','sortBy'
+    ));
 }
+
 
     // Create form
     public function create()
     {
         // Suggest only passports that are ready to be collected
         // adjust the status value to match your app (e.g., 'RECEIVED_FROM_AGENT')
-        $passports = Passport::with(['agent','employee'])
-            ->where('status', 'RECEIVED_FROM_AGENT')
-            ->orderByDesc('id')->get();
+$passports = Passport::with(['agent','employee'])
+    ->where('status', 'RECEIVED_FROM_AGENT')
+    ->whereHas('processings') // ✅ only passports that have at least one processing
+    ->orderByDesc('id')
+    ->get();
 
         $employees = Employee::orderBy('name')->get();
 

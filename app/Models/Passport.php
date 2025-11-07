@@ -51,5 +51,9 @@ class Passport extends Model
         return $this->belongsTo(PassportOfficer::class);
     }
     public function processings() { return $this->hasMany(\App\Models\PassportProcessing::class); }
-
+    
+public function collections()
+{
+    return $this->hasMany(\App\Models\PassportCollection::class);
+}
 }

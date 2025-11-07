@@ -10,26 +10,25 @@ use Illuminate\Http\Request;
 
 class PassportProcessingController extends Controller
 {
-public function index(\Illuminate\Http\Request $request)
+public function index(Request $request)
 {
-    // 1) Read query params (filters)
+    // 1️⃣ Read filters
     $status     = $request->query('status');        // PENDING | IN_PROGRESS | DONE | REJECTED
     $employeeId = $request->query('employee_id');   // int
-    $agencyId   = $request->query('agency_id');     // int or "__NULL__" if you decide to support unassigned filter
-    $search     = $request->query('q');             // applicant or passport no
+    $agencyId   = $request->query('agency_id');     // int
+    $search     = $request->query('q');             // text
     $dateFrom   = $request->query('date_from');     // YYYY-MM-DD
     $dateTo     = $request->query('date_to');       // YYYY-MM-DD
+    $collected  = $request->query('collected');     // 'collected' | 'not_collected'
 
-    // 2) Base query with eager loading (prevents N+1)
-    $query = \App\Models\PassportProcessing::query()
-        ->with([
-            'passport:id,passport_number,applicant_name',
-            'employee:id,name',
-            'agency:id,name',
-        ])
-        ->orderByDesc('created_at'); // newest first
+    // 2️⃣ Base query with eager loading
+    $query = PassportProcessing::with([
+        'passport:id,passport_number,applicant_name',
+        'employee:id,name',
+        'agency:id,name',
+    ])->orderByDesc('created_at');
 
-    // 3) Apply filters
+    // 3️⃣ Apply filters
     if ($status) {
         $query->where('status', $status);
     }
@@ -39,12 +38,7 @@ public function index(\Illuminate\Http\Request $request)
     }
 
     if ($agencyId) {
-        // If you want to support "Unassigned" filter later:
-        if ($agencyId === '__NULL__') {
-            $query->whereNull('agency_id');
-        } else {
-            $query->where('agency_id', $agencyId);
-        }
+        $query->where('agency_id', $agencyId);
     }
 
     if ($search) {
@@ -57,15 +51,23 @@ public function index(\Illuminate\Http\Request $request)
     if ($dateFrom) {
         $query->whereDate('created_at', '>=', $dateFrom);
     }
+
     if ($dateTo) {
         $query->whereDate('created_at', '<=', $dateTo);
     }
 
-    // 4) Data for dropdowns
-    $employees = \App\Models\Employee::select('id','name')->orderBy('name')->get();
-    $agencies  = \App\Models\Agency::select('id','name')->orderBy('name')->get();
+    // 4️⃣ Collection Status filter
+    if ($collected === 'collected') {
+        $query->whereHas('passport.collections');
+    } elseif ($collected === 'not_collected') {
+        $query->whereDoesntHave('passport.collections');
+    }
 
-    // 5) Summary counts (based on current filters)
+    // 5️⃣ Dropdown data
+    $employees = Employee::select('id','name')->orderBy('name')->get();
+    $agencies  = Agency::select('id','name')->orderBy('name')->get();
+
+    // 6️⃣ Summary counts
     $totals = [
         'total'       => (clone $query)->count(),
         'pending'     => (clone $query)->where('status', 'PENDING')->count(),
@@ -74,14 +76,16 @@ public function index(\Illuminate\Http\Request $request)
         'rejected'    => (clone $query)->where('status', 'REJECTED')->count(),
     ];
 
-    // 6) Pagination (keeps filters in URL)
+    // 7️⃣ Paginate
     $processings = $query->paginate(20)->withQueryString();
 
+    // 8️⃣ Return view
     return view('backend.pages.processings.index', compact(
         'processings', 'employees', 'agencies', 'totals',
-        'status','employeeId','agencyId','search','dateFrom','dateTo'
+        'status','employeeId','agencyId','search','dateFrom','dateTo','collected'
     ));
 }
+
 
 public function create()
 {
@@ -129,6 +133,7 @@ public function create()
             'nid_number'      => $passport->nid_number,
             'notes'           => $passport->notes,
             'picture_url'     => $passport->passport_picture ? asset('storage/'.$passport->passport_picture) : null,
+            
         ]);
     }
 
@@ -144,7 +149,7 @@ public function create()
 
         PassportProcessing::create($validated);
 
-        return redirect()->route('processings.create')->with('success', 'Processing record created successfully.');
+        return redirect()->route('processings.index')->with('success', 'Processing record created successfully.');
     }
 
     public function show(PassportProcessing $processing)
