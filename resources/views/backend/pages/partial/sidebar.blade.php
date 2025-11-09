@@ -15,7 +15,7 @@
 
     <!-- Agent -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('agentMenu', this); setActiveLink(this)">
         <i class="fas fa-user-tie me-3"></i><span class="sidebar-link-title">Agent</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -28,7 +28,7 @@
 
     <!-- Passport -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('passportMenu', this); setActiveLink(this)">
         <i class="fas fa-passport me-3"></i><span class="sidebar-link-title">Passport</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -41,7 +41,7 @@
 
     <!-- Employee -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('employeeMenu', this); setActiveLink(this)">
         <i class="fas fa-users me-3"></i><span class="sidebar-link-title">Employee</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -54,7 +54,7 @@
 
     <!-- Working Category -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('categoryMenu', this); setActiveLink(this)">
         <i class="fas fa-layer-group me-3"></i><span class="sidebar-link-title">Working Category</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -67,7 +67,7 @@
 
     <!-- Agencies -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('agenciesMenu', this); setActiveLink(this)">
         <i class="fas fa-building me-3"></i><span class="sidebar-link-title">Agencies</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -80,7 +80,7 @@
 
     <!-- Processing -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('processingMenu', this); setActiveLink(this)">
         <i class="fas fa-cogs me-3"></i><span class="sidebar-link-title">Processing</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -93,7 +93,7 @@
 
     <!-- Passport Officer -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('officerMenu', this); setActiveLink(this)">
         <i class="fas fa-user-shield me-3"></i><span class="sidebar-link-title">Passport Officer</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -106,7 +106,7 @@
 
     <!-- Passport Collections -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('collectionsMenu', this); setActiveLink(this)">
         <i class="fas fa-briefcase me-3"></i><span class="sidebar-link-title">Passport Collections</span>
         <i class="fas fa-chevron-right ms-auto"></i>
@@ -118,7 +118,7 @@
     </li>
 <!-- Registration (submenu) -->
 <li class="sidebar-list-item">
-  <a class="sidebar-link text-white d-flex align-items-center" href="#"
+  <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
      onclick="toggleSubmenu('registrationMenu', this); setActiveLink(this)">
     <i class="fas fa-user-plus me-3"></i>
     <span class="sidebar-link-title">Registration</span>
@@ -140,7 +140,7 @@
 
     <!-- ✅ Reports Section -->
     <li class="sidebar-list-item">
-      <a class="sidebar-link text-white d-flex align-items-center" href="#"
+      <a class="sidebar-link text-white d-flex align-items-center" style="cursor: pointer;"
          onclick="toggleSubmenu('reportsMenu', this); setActiveLink(this)">
         <i class="fas fa-chart-bar me-3"></i><span class="sidebar-link-title">Reports</span>
         <i class="fas fa-chevron-right ms-auto"></i>
