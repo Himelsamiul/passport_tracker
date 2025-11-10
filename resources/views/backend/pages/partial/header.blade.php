@@ -1,111 +1,125 @@
 <header class="header">
-  <nav class="navbar navbar-expand-lg px-4 py-2 bg-dark shadow">
-    
-    <a class="navbar-brand fw-bold text-uppercase text-animated" href="">
-      <span class="d-none d-brand-partial">Passport Management</span>
-      <span class="d-none d-sm-inline">System</span>
-    </a>
+  <nav class="navbar navbar-expand-lg shadow-sm py-2" style="background:var(--deepblue);">
+    <div class="container-fluid nav-grid px-3">
 
-    <ul class="ms-auto d-flex align-items-center list-unstyled mb-0">
-      <li class="nav-item dropdown ms-auto">
-        <a class="nav-link pe-0 text-white" id="userInfo" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img class="avatar p-1 rounded-circle border border-light" src="{{ asset('logo.jpg') }}" alt="Sharmin Akter">
-        </a>
-        <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated" aria-labelledby="userInfo">
-          <div class="dropdown-header text-gray-700">
-            <h6 class="text-uppercase font-weight-bold"></h6>
-            <small>Shahriar Worldwide Venture</small>
-          </div>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Settings</a>
-          <a class="dropdown-item" href="#">Activity Log</a>
-          <div class="dropdown-divider"></div>
-          <!-- Logout link changed to button with id -->
-          <a class="dropdown-item text-danger" href="{{ route('logout') }}" id="logout-link">
-            <i class="fas fa-sign-out-alt"></i> Logout
-          </a>
-        </div>
-      </li>
-    </ul>
+      {{-- LEFT: Clock --}}
+      <div class="nav-left d-flex align-items-center">
+        <div id="clock" class="text-gold fw-semibold fs-5"></div>
+      </div>
+
+      {{-- CENTER: Brand --}}
+      <a class="navbar-brand nav-center d-flex align-items-center gap-2 fw-bold text-uppercase text-gold"
+         href="{{ url('/') }}">
+        <img src="{{ asset('logo.jpg') }}" alt="Logo"
+             class="rounded-circle border border-2 border-light" width="42" height="42">
+        <span class="brand-title">Passport Management System</span>
+      </a>
+
+      {{-- RIGHT: User --}}
+      <div class="nav-right d-flex align-items-center">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle user-toggle d-flex align-items-center gap-2"
+               href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="icon-circle"><i class="fas fa-user-tie"></i></div>
+              <span class="text-white fw-semibold text-capitalize user-label">
+                {{ session('user')->name ?? Auth::user()->name ?? 'Guest User' }}
+              </span>
+            </a>
+
+            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-2"
+                 aria-labelledby="userDropdown">
+              <div class="px-2 py-1 text-center">
+                <div class="fw-semibold text-capitalize text-dark">
+                  {{ session('user')->name ?? Auth::user()->name ?? 'Guest User' }}
+                </div>
+                <small class="text-secondary">Shahriar Worldwide Venture</small>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                <i class="fas fa-cog text-muted"></i><span>Settings</span>
+              </a>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                <i class="fas fa-list text-muted"></i><span>Activity Log</span>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item d-flex align-items-center gap-2 text-danger"
+                 href="{{ route('logout') }}"
+                 onclick="return confirm('Are you sure you want to logout?');">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+              </a>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
   </nav>
 </header>
 
 <style>
-  .navbar {
-    background: #2c3e50;
-    border-radius: 10px;
+  :root{ --deepblue:#02152E; --gold:#FFD700; }
+
+  /* Grid locks positions: [left clock] [center brand] [right user] */
+  .nav-grid{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items:center;
+    gap:12px;
+  }
+  .nav-left  { justify-self:start;
+             margin-left: 30px;    }
+  .nav-center{ justify-self:center; }
+  .nav-right { justify-self:end;
+              margin-right: 40px;  }
+
+  /* Gold gradient text */
+  .text-gold{
+    background:linear-gradient(90deg,#FFD700,#E6BE8A,#B8860B);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .brand-title{ font-size:clamp(20px,2.3vw,26px); letter-spacing:.5px; }
+
+  /* Clock */
+  #clock{ letter-spacing:1px; text-shadow:0 0 8px rgba(255,215,0,.5); font-weight:700; }
+
+  /* User dropdown styles (same as before) */
+  .user-toggle{ color:#fff !important; border-radius:12px; padding:6px 10px; transition:background .25s, box-shadow .25s; }
+  .user-toggle:hover{ background:rgba(255,255,255,.07); box-shadow:0 2px 8px rgba(0,0,0,.2); }
+  .user-toggle::after{ display:none; }
+  .icon-circle{
+    background:linear-gradient(145deg,var(--gold),#e0b84e);
+    color:#0d1117; width:42px; height:42px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; border:2px solid #fff; box-shadow:0 0 8px rgba(255,215,0,.4);
+    transition:transform .25s, box-shadow .25s;
+  }
+  .icon-circle:hover{ transform:scale(1.08); box-shadow:0 0 15px rgba(255,215,0,.6); }
+  .user-label{ font-size:15px; letter-spacing:.3px; }
+  .dropdown-menu{ min-width:240px; }
+  .dropdown-item{ border-radius:8px; padding:.5rem .7rem; font-weight:500; }
+  .dropdown-item:hover{ background:#f8f9fa; }
+  .dropdown-menu.show::before{
+    content:""; position:absolute; top:-8px; right:25px; width:14px; height:14px;
+    background:#fff; transform:rotate(45deg); box-shadow:-2px -2px 6px rgba(0,0,0,.05);
   }
 
-  .navbar-brand {
-    font-size: 1.4rem;
-    letter-spacing: 1px;
-    font-weight: bold;
-    animation: colorChange 5s infinite alternate;
-  }
-
-  @keyframes colorChange {
-    0% {
-      color: #f39c12; /* Golden */
-    }
-    25% {
-      color: #e74c3c; /* dRed */
-    }
-    50% {
-      color: #2ecc71; /* Green */
-    }
-    75% {
-      color: #3498db; /* Blue */
-    }
-    100% {
-      color: #9b59b6; /* Purple */
-    }
-  }
-
-  .navbar-brand span {
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
-  }
-
-  .avatar {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-  }
-
-  .dropdown-menu {
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .dropdown-item:hover {
-    background: #34495e;
-    color: white;
+  /* Mobile tweak: keep positions but allow wrapping cleanly */
+  @media (max-width: 576px){
+    .nav-grid{ grid-template-columns: 1fr auto auto; }
+    .nav-center{ justify-self:center; }
+    .brand-title{ font-size:18px; }
+    #clock{ font-size:14px; }
   }
 </style>
 
-<!-- Include SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const logoutLink = document.getElementById('logout-link');
-    if(logoutLink) {
-      logoutLink.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        Swal.fire({
-          title: 'Are you sure you want to logout?',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, logout',
-          cancelButtonText: 'Cancel',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Redirect to logout route
-            window.location.href = "";
-          }
-        });
-      });
-    }
-  });
+  function updateClock(){
+    const now=new Date();
+    let h=now.getHours(), m=now.getMinutes(), s=now.getSeconds();
+    const ampm=h>=12?'PM':'AM'; h=h%12||12;
+    document.getElementById('clock').textContent =
+      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${ampm}`;
+  }
+  setInterval(updateClock,1000); updateClock();
 </script>
