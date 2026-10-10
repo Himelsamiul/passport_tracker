@@ -40,7 +40,8 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            // Hostinger এ symlink disabled, তাই public_html/storage এ সরাসরি লেখা যায়
+            'root' => env('PUBLIC_DISK_ROOT', storage_path('app/public')),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
