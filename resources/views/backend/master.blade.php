@@ -25,21 +25,15 @@
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17/dist/sweetalert2.min.css" rel="stylesheet">
 
-    <style>
-      body{ font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    <!-- Admin design system (brand: navy + gold) -->
+    <link href="{{ asset('css/admin.css') }}?v=2" rel="stylesheet">
 
+    <style>
       .notify {
         z-index: 9999;
         justify-content: start;
       }
-      /* Bubbly theme এর .page-holder/.bg-gray-100 এর বিকল্প */
-      .page-holder {
-        background:#f4f6fa;
-        min-height:calc(100vh - 62px);
-        padding:20px;
-        flex:1 1 auto;
-      }
-      .header{ position:sticky; top:0; z-index:1030; }
+      .header { position: sticky; top: 0; z-index: 1030; }
     </style>
 </head>
 

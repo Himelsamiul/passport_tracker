@@ -1,5 +1,5 @@
 <header class="header">
-  <nav class="navbar navbar-expand-lg shadow-sm py-2" style="background:var(--deepblue);">
+  <nav class="navbar navbar-expand-lg py-2 header-nav">
     <div class="container-fluid nav-grid px-3">
 
       {{-- LEFT: Clock --}}
@@ -59,6 +59,13 @@
 
 <style>
   :root{ --deepblue:#02152E; --gold:#FFD700; }
+
+  /* Premium navy bar with subtle depth + gold hairline */
+  .header-nav{
+    background:linear-gradient(90deg,#04203f 0%, var(--deepblue) 45%, #04203f 100%);
+    border-bottom:1px solid rgba(255,215,0,.28);
+    box-shadow:0 10px 30px -14px rgba(2,21,46,.6);
+  }
 
   /* Grid locks positions: [left clock] [center brand] [right user] */
   .nav-grid{

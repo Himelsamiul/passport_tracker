@@ -1,7 +1,7 @@
 <div class="sidebar py-3" id="sidebar">
-  <button onclick="toggleSidebar()" 
+  <button onclick="toggleSidebar()" title="Toggle sidebar"
           class="btn btn-outline-light mb-3 w-100 text-white border-0 sidebar-toggle-btn">
-    Toggle Sidebar
+    <i class="fas fa-bars me-2"></i><span class="btn-text">Collapse Menu</span>
   </button>
 
   <input type="text" id="sidebarSearch" placeholder="Search..." class="form-control sidebar-search mb-3">
@@ -205,58 +205,125 @@
 
 <style>
   :root{
-    --deepblue:#02152E;      /* match header; change once to recolor all */
-    --deepblue-2:#0a2a52;    /* lighter shade for inputs */
-    --hover:#0b203f;
-    --active:#12824A;        /* active pill color */
+    --deepblue:#02152E;
+    --deepblue-2:#0a2a52;
+    --hover:rgba(255,255,255,.07);
+    --active-bg:linear-gradient(90deg,rgba(255,215,0,.16),rgba(255,215,0,.05));
     --ink:#fff;
   }
 
   .sidebar{
-    width:260px;
-    background:var(--deepblue);
+    width:264px;
+    background:linear-gradient(180deg,#04203f 0%, var(--deepblue) 55%, #010b1c 100%);
     color:var(--ink);
-    padding:15px;
-    border-radius:10px;
-    height:100vh;           /* make it full-height */
-    position:sticky; top:0; /* stick while page scrolls */
-    overflow-y:auto;        /* scroll inside sidebar if long */
-    box-shadow:0 0 15px rgba(0,0,0,.22);
+    padding:16px 12px;
+    border-radius:14px;
+    margin:10px 0 10px 10px;
+    height:calc(100vh - 62px);
+    position:sticky; top:62px;
+    overflow-y:auto;
+    box-shadow:12px 0 32px -18px rgba(2,21,46,.55);
+    transition:width .28s ease, margin .28s ease;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(255,255,255,.25) transparent;
   }
-  .sidebar.collapsed{ width:72px; }
+  .sidebar::-webkit-scrollbar{ width:6px; }
+  .sidebar::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.22); border-radius:6px; border:none; }
+
+  .sidebar.collapsed{ width:76px; margin-left:6px; }
   .sidebar.collapsed .sidebar-link-title,
   .sidebar.collapsed .submenu{ display:none !important; }
   .sidebar.collapsed .fa-chevron-right{ display:none; }
+  .sidebar.collapsed .sidebar-link{ justify-content:center; padding:11px 0; }
+  .sidebar.collapsed .sidebar-search,
+  .sidebar.collapsed .sidebar-toggle-btn .btn-text{ display:none; }
+  .sidebar.collapsed .sidebar-toggle-btn i{ margin:0 !important; }
 
+  /* Top: collapse toggle + search */
   .sidebar-toggle-btn{
-    background:linear-gradient(90deg,var(--deepblue-2),var(--deepblue));
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:8px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:10px;
+    font-size:.82rem;
+    padding:.45rem .6rem;
     transition:.2s;
   }
-  .sidebar-toggle-btn:hover{ background:var(--hover); }
-
-  .sidebar-list-item{ margin-bottom:10px; }
-
-  .sidebar-link{
-    color:var(--ink);
-    display:flex; align-items:center;
-    padding:10px; border-radius:8px;
-    text-decoration:none;
-    transition:background .2s,color .2s;
-  }
-  .sidebar-link:hover{ background:var(--hover); }
-  .sidebar-link.active{ background:var(--active); }
-
-  .submenu{ padding-left:20px; }
-  .fa-chevron-right{ transition:transform .25s; }
-  .rotate-icon{ transform:rotate(90deg); }
+  .sidebar-toggle-btn:hover{ background:rgba(255,255,255,.12); }
 
   .sidebar-search{
-    background:var(--deepblue-2);
+    background:rgba(255,255,255,.07);
     color:#fff;
-    border:1px solid rgba(255,255,255,.2);
-    border-radius:8px;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:10px;
+    font-size:.85rem;
+    padding:.5rem .75rem;
   }
-  .sidebar-search::placeholder{ color:#c9d1d9; }
+  .sidebar-search:focus{
+    background:rgba(255,255,255,.1);
+    border-color:rgba(255,215,0,.55);
+    box-shadow:0 0 0 .2rem rgba(255,215,0,.12);
+    color:#fff;
+  }
+  .sidebar-search::placeholder{ color:rgba(255,255,255,.55); }
+
+  /* Menu */
+  .sidebar-list-item{ margin-bottom:4px; }
+
+  .sidebar-link{
+    position:relative;
+    color:rgba(255,255,255,.88);
+    display:flex; align-items:center;
+    padding:10px 12px;
+    border-radius:10px;
+    font-size:.9rem;
+    font-weight:500;
+    text-decoration:none;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease, transform .15s ease;
+  }
+  .sidebar-link i.fas:first-child{
+    width:34px; height:34px;
+    display:inline-flex; align-items:center; justify-content:center;
+    border-radius:9px;
+    background:rgba(255,255,255,.07);
+    font-size:.85rem;
+    transition:background .2s ease, color .2s ease;
+    flex:0 0 34px;
+  }
+  .sidebar-link:hover{ background:var(--hover); color:#fff; transform:translateX(2px); }
+  .sidebar-link:hover i.fas:first-child{ background:rgba(255,215,0,.18); color:var(--gold); }
+
+  .sidebar-link.active{
+    background:var(--active-bg);
+    color:var(--gold);
+    font-weight:600;
+  }
+  .sidebar-link.active i.fas:first-child{ background:rgba(255,215,0,.2); color:var(--gold); }
+  .sidebar-link.active::before{
+    content:"";
+    position:absolute; left:-12px; top:20%;
+    height:60%; width:3px;
+    border-radius:0 4px 4px 0;
+    background:linear-gradient(180deg,var(--gold),var(--gold-soft));
+  }
+
+  /* Submenu */
+  .submenu{ padding-left:14px; margin-top:2px; position:relative; }
+  .submenu::before{
+    content:"";
+    position:absolute; left:28px; top:2px; bottom:6px;
+    width:1.5px;
+    background:rgba(255,255,255,.12);
+    border-radius:2px;
+  }
+  .submenu .sidebar-link{
+    padding:7px 10px;
+    font-size:.82rem;
+    color:rgba(255,255,255,.72);
+  }
+  .submenu .sidebar-link:hover{ color:#fff; }
+  .submenu .sidebar-link.active{ color:var(--gold); }
+
+  .fa-chevron-right{ transition:transform .25s; font-size:.7rem; opacity:.6; }
+  .rotate-icon{ transform:rotate(90deg); }
 </style>

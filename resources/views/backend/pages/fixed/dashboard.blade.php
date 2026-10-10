@@ -37,21 +37,14 @@
   <div class="row g-3">
     @foreach($cards as $c)
       <div class="col-6 col-md-4 col-lg-1-5" style="flex:0 0 20%;max-width:20%;">
-        <div class="shadow-sm" style="
-          border-radius:.7rem;
-          background:linear-gradient(135deg,{{ $c['bg'] }},{{ $c['bg'] }}cc);
-          color:{{ $c['color'] ?? '#fff' }};
-          text-align:center;
-          padding:.6rem .7rem;
-          min-height:105px; transition:.2s;
-        " onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-          <div style="font-size:1.2rem;margin-bottom:.2rem;"><i class="fas {{ $c['icon'] }}"></i></div>
-          <div class="counter" data-val="{{ (int)$c['value'] }}" style="font-size:1.15rem;font-weight:800;">0</div>
-          <div style="font-size:.8rem;font-weight:600;">{{ $c['label'] }}</div>
-          @php $w=min(100,round(($c['value']/$max)*100)); @endphp
-          <div style="height:4px;background:rgba(255,255,255,.3);border-radius:10px;margin-top:.3rem;">
-            <div style="width:{{ $w }}%;height:100%;background:#fff;border-radius:10px;"></div>
+        <div class="kpi-card" style="--accent:{{ $c['bg'] }};">
+          <div class="kpi-icon" style="background:{{ $c['bg'] }}1c;color:{{ $c['color'] ?? $c['bg'] }};">
+            <i class="fas {{ $c['icon'] }}"></i>
           </div>
+          <div class="counter kpi-value" data-val="{{ (int)$c['value'] }}">0</div>
+          <div class="kpi-label">{{ $c['label'] }}</div>
+          @php $w=min(100,round(($c['value']/$max)*100)); @endphp
+          <div class="kpi-bar"><span style="width:{{ $w }}%"></span></div>
         </div>
       </div>
     @endforeach
@@ -71,23 +64,16 @@
   <div class="row g-3 mt-1">
     @foreach($statusCards as $s)
       <div class="col-6 col-md-4 col-lg-1-5" style="flex:0 0 20%;max-width:20%;">
-        {{-- Make each status card clickable to filter (adjust route if different) --}}
+        {{-- Clickable status filter --}}
         <a href="{{ route('passports.index', ['status' => $s['query']]) }}" class="text-decoration-none" style="display:block;">
-          <div class="shadow-sm" style="
-            border-radius:.7rem;
-            background:linear-gradient(135deg,{{ $s['bg'] }},{{ $s['bg'] }}cc);
-            color:{{ $s['color'] ?? '#fff' }};
-            text-align:center;
-            padding:.55rem .65rem;
-            min-height:96px; transition:.2s;
-          " onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-            <div style="font-size:1.05rem;margin-bottom:.15rem;"><i class="fas {{ $s['icon'] }}"></i></div>
-            <div class="counter" data-val="{{ (int)$s['value'] }}" style="font-size:1.05rem;font-weight:800;">0</div>
-            <div style="font-size:.78rem;font-weight:700;">{{ $s['label'] }}</div>
-            @php $ws=min(100,round(($s['value']/$maxS)*100)); @endphp
-            <div style="height:3.5px;background:rgba(255,255,255,.3);border-radius:10px;margin-top:.28rem;">
-              <div style="width:{{ $ws }}%;height:100%;background:#fff;border-radius:10px;"></div>
+          <div class="kpi-card" style="--accent:{{ $s['bg'] }};">
+            <div class="kpi-icon" style="background:{{ $s['bg'] }}1c;color:{{ $s['color'] ?? $s['bg'] }};">
+              <i class="fas {{ $s['icon'] }}"></i>
             </div>
+            <div class="counter kpi-value" data-val="{{ (int)$s['value'] }}">0</div>
+            <div class="kpi-label">{{ $s['label'] }}</div>
+            @php $ws=min(100,round(($s['value']/$maxS)*100)); @endphp
+            <div class="kpi-bar"><span style="width:{{ $ws }}%"></span></div>
           </div>
         </a>
       </div>
@@ -97,62 +83,40 @@
   {{-- ================== CHART + NOTES ================== --}}
   <div class="row g-3 mt-2">
 
-    {{-- Pie Chart (small, transparent BLUE block) --}}
+    {{-- Pie Chart --}}
     <div class="col-lg-7">
-      <div class="shadow-sm p-3" style="
-        border-radius:.7rem;
-        background:rgba(14,165,233,0.10); /* transparent blue */
-        border:1px solid rgba(14,165,233,0.25);
-      ">
-        <h6 class="fw-semibold mb-2" style="font-size:.95rem;">Processing Status Overview</h6>
-        <div style="max-width:240px;margin:auto;background:#ffffffc7;border-radius:.6rem;padding:.5rem;">
-          <canvas id="chart" height="60"></canvas>
-        </div>
-        <div class="row text-center mt-2 small fw-semibold" style="row-gap:.4rem;">
-          <div class="col" style="color:#fbbf24;">● Pending: {{ $statusCounts['pending'] ?? 0 }}</div>
-          <div class="col" style="color:#0ea5e9;">● Ongoing: {{ $statusCounts['ongoing'] ?? 0 }}</div>
-          <div class="col" style="color:#10b981;">● Done: {{ $statusCounts['done'] ?? 0 }}</div>
-          <div class="col" style="color:#ef4444;">● Rejected: {{ $statusCounts['rejected'] ?? 0 }}</div>
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="section-title"><i class="fas fa-chart-pie"></i> Processing Status Overview</div>
+          <div class="chart-wrap">
+            <canvas id="chart" height="80"></canvas>
+          </div>
+          <div class="row text-center mt-3 small fw-semibold" style="row-gap:.4rem;">
+            <div class="col" style="color:#d97706;">● Pending: {{ $statusCounts['pending'] ?? 0 }}</div>
+            <div class="col" style="color:#0284c7;">● Ongoing: {{ $statusCounts['ongoing'] ?? 0 }}</div>
+            <div class="col" style="color:#059669;">● Done: {{ $statusCounts['done'] ?? 0 }}</div>
+            <div class="col" style="color:#dc2626;">● Rejected: {{ $statusCounts['rejected'] ?? 0 }}</div>
+          </div>
         </div>
       </div>
     </div>
 
-    {{-- Notes (transparent GOLDEN bg + status-colored text) --}}
+    {{-- Notes --}}
     <div class="col-lg-5">
-      <div class="shadow-sm p-3" style="
-        border-radius:.7rem;
-        background:rgba(255,215,0,0.12); /* transparent golden */
-        border:1px solid rgba(184,134,11,0.35);
-      ">
-        <h6 class="fw-bold mb-2" style="color:#8a6d1d;font-size:.95rem;">নোটস</h6>
-        <ul style="list-style:none;padding:0;margin:0;display:grid;gap:.5rem;">
-          <li style="
-            background:#ffffffc2;border-left:4px solid #fbbf24;
-            padding:.45rem .6rem;border-radius:.45rem;font-weight:700;color:#4b5563;">
-            <span style="color:#fbbf24;">● Pending</span> — আবেদন গ্রহণ হয়েছে, প্রক্রিয়া শুরু বাকি।
-          </li>
-          <li style="
-            background:#ffffffc2;border-left:4px solid #0ea5e9;
-            padding:.45rem .6rem;border-radius:.45rem;font-weight:700;color:#4b5563;">
-            <span style="color:#0ea5e9;">● Ongoing</span> — ডকুমেন্ট/ভেরিফিকেশন/সাবমিশন চলমান।
-          </li>
-          <li style="
-            background:#ffffffc2;border-left:4px solid #10b981;
-            padding:.45rem .6rem;border-radius:.45rem;font-weight:700;color:#4b5563;">
-            <span style="color:#10b981;">● Done</span> — কাজ সম্পন্ন; ডেলিভারি/কলেক্টের জন্য প্রস্তুত।
-          </li>
-          <li style="
-            background:#ffffffc2;border-left:4px solid #ef4444;
-            padding:.45rem .6rem;border-radius:.45rem;font-weight:700;color:#4b5563;">
-            <span style="color:#ef4444;">● Rejected</span> — ডকুমেন্ট/নীতিগত কারণে বাতিল।
-          </li>
-          <li style="
-            background:#ffffffad;border:1px dashed rgba(184,134,11,0.45);
-            padding:.45rem .6rem;border-radius:.45rem;font-weight:600;color:#6b7280;">
-            টিপস: <strong style="color:#0ea5e9;">Active Processing</strong> গণনায় কেবল যে পাসপোর্টগুলো এখনো
-            <em style="color:#ef4444;">Collected</em> হয়নি সেগুলো ধরা হয়।
-          </li>
-        </ul>
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="section-title"><i class="fas fa-circle-info"></i> Status Guide</div>
+          <ul class="status-guide">
+            <li style="--c:#f59e0b;"><strong>Pending</strong> — আবেদন গ্রহণ হয়েছে, প্রক্রিয়া শুরু বাকি।</li>
+            <li style="--c:#0ea5e9;"><strong>Ongoing</strong> — ডকুমেন্ট/ভেরিফিকেশন/সাবমিশন চলমান।</li>
+            <li style="--c:#10b981;"><strong>Done</strong> — কাজ সম্পন্ন; ডেলিভারি/কলেক্টের জন্য প্রস্তুত।</li>
+            <li style="--c:#ef4444;"><strong>Rejected</strong> — ডকুমেন্ট/নীতিগত কারণে বাতিল।</li>
+          </ul>
+          <div class="tip-box">
+            টিপস: <strong>Active Processing</strong> গণনায় কেবল যে পাসপোর্টগুলো এখনো
+            <em>Collected</em> হয়নি সেগুলো ধরা হয়।
+          </div>
+        </div>
       </div>
     </div>
   </div>

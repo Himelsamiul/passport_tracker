@@ -91,7 +91,12 @@
 <body>
 
   <div class="glass-card">
-    <div class="card-header">Admin Login</div>
+    <div class="card-header">
+      <img src="{{ asset('logo.jpg') }}" alt="Logo"
+           style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.75);
+                  box-shadow:0 4px 14px rgba(0,0,0,.35);margin-bottom:8px;object-fit:cover;">
+      <div>Admin Login</div>
+    </div>
 
     <div class="card-body">
       @if(session('error'))
