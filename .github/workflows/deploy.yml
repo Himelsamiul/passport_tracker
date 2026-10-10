@@ -77,28 +77,27 @@ jobs:
               app/public/index.php > staging/public/index.php
           php -l staging/public/index.php
 
-      # ---- প্রথমবার চললে সময় বেশি লাগবে (vendor সহ সব file যাবে) ----
-      - name: FTP deploy application (outside public_html)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./app/
-          server-dir: /domains/${{ secrets.FTP_DOMAIN }}/laravel-app/
+      # ---- FTP ধীর ও অনির্ভরযোগ্য (১০k+ file এ server connection কেটে দেয়),
+      # তাই একটাই tarball SSH (SCP) দিয়ে পাঠানো হয় ----
+      - name: Package application (single tarball)
+        run: |
+          mv app laravel-app
+          mv staging/public public_html-pkg
+          tar -czf deploy.tar.gz laravel-app public_html-pkg
+          du -h deploy.tar.gz
 
-      - name: FTP deploy public assets (public_html)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Upload tarball via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          host: ${{ secrets.FTP_SERVER }}
+          port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./staging/public/
-          server-dir: /domains/${{ secrets.FTP_DOMAIN }}/public_html/
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "deploy.tar.gz"
+          target: /home/${{ secrets.FTP_USERNAME }}/
 
-      # ---- SSH থাকলে .env তৈরি (প্রথমবার) + migration + cache চলবে ----
-      # SSH_PASSWORD / SSH_PORT secret add করলে এই step টা চলবে
-      - name: Run migrations and optimize
+      # ---- Extract + public_html swap + .env (প্রথমবার) + migration + cache ----
+      - name: Extract, activate and optimize (SSH)
         if: env.SSH_PASSWORD != ''
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -108,7 +107,14 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script_stop: true
           script: |
-            cd /home/${{ secrets.FTP_USERNAME }}/domains/${{ secrets.FTP_DOMAIN }}/laravel-app
+            cd /home/${{ secrets.FTP_USERNAME }}/domains/${{ secrets.FTP_DOMAIN }}
+            rm -rf laravel-app/vendor laravel-app/bootstrap/cache/*.php
+            tar -xzf ~/deploy.tar.gz
+            mkdir -p public_html
+            find public_html -mindepth 1 -maxdepth 1 ! -name storage -exec rm -rf {} +
+            cp -a public_html-pkg/. public_html/
+            rm -rf public_html-pkg
+            cd laravel-app
             if [ ! -f .env ]; then
             cat > .env <<'ENVEOF'
             APP_NAME="SRG Passport"
@@ -144,7 +150,7 @@ jobs:
             fi
             grep -q "^APP_KEY=base64" .env || php artisan key:generate --force
             php artisan migrate --force
-            php artisan storage:link || true
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            rm -f ~/deploy.tar.gz
