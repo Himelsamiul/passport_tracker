@@ -1,0 +1,117 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, gd, zip, fileinfo
+          coverage: none
+
+      - name: Install composer dependencies (production)
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: laravel-app
+          path: |
+            *
+            !node_modules
+            !tests
+            !.github
+            !.vscode
+            !public/storage
+          retention-days: 1
+          include-hidden-files: true
+
+  deploy:
+    name: Deploy to Hostinger
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: laravel-app
+          path: app
+
+      - name: Stage public folder for public_html
+        run: |
+          mkdir -p staging
+          cp -r app/public staging/public
+          # index.php টা public_html থেকে laravel-app ফোল্ডারের ভেতরের কোড point করে
+          sed -e "s|'/../vendor|'/../laravel-app/vendor|" \
+              -e "s|'/../bootstrap|'/../laravel-app/bootstrap|" \
+              -e "s|'/../storage|'/../laravel-app/storage|" \
+              app/public/index.php > staging/public/index.php
+          php -l staging/public/index.php
+
+      # ---- প্রথমবার চললে সময় বেশি লাগবে (vendor সহ সব file যাবে) ----
+      - name: FTP deploy application (outside public_html)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./app/
+          server-dir: /domains/${{ secrets.FTP_DOMAIN }}/laravel-app/
+
+      - name: FTP deploy public assets (public_html)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./staging/public/
+          server-dir: /domains/${{ secrets.FTP_DOMAIN }}/public_html/
+
+      # ---- Optional: SSH enable থাকলে migration + cache চলবে ----
+      # Hostinger hPanel → Advanced → SSH Access থেকে SSH on করে
+      # SSH_HOST / SSH_USERNAME / SSH_PASSWORD secrets add করলে এই step টা চলবে
+      - name: Run migrations and optimize
+        if: env.SSH_HOST != ''
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script_stop: true
+          script: |
+            cd /home/${{ secrets.SSH_USERNAME }}/domains/${{ secrets.FTP_DOMAIN }}/laravel-app
+            php artisan migrate --force
+            php artisan storage:link || true
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
