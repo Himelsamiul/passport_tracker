@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
-      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
@@ -96,20 +96,53 @@ jobs:
           local-dir: ./staging/public/
           server-dir: /domains/${{ secrets.FTP_DOMAIN }}/public_html/
 
-      # ---- Optional: SSH enable থাকলে migration + cache চলবে ----
-      # Hostinger hPanel → Advanced → SSH Access থেকে SSH on করে
-      # SSH_HOST / SSH_USERNAME / SSH_PASSWORD secrets add করলে এই step টা চলবে
+      # ---- SSH থাকলে .env তৈরি (প্রথমবার) + migration + cache চলবে ----
+      # SSH_PASSWORD / SSH_PORT secret add করলে এই step টা চলবে
       - name: Run migrations and optimize
-        if: env.SSH_HOST != ''
+        if: env.SSH_PASSWORD != ''
         uses: appleboy/ssh-action@v1.2.2
         with:
-          host: ${{ secrets.SSH_HOST }}
+          host: ${{ secrets.FTP_SERVER }}
           port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USERNAME }}
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script_stop: true
           script: |
-            cd /home/${{ secrets.SSH_USERNAME }}/domains/${{ secrets.FTP_DOMAIN }}/laravel-app
+            cd /home/${{ secrets.FTP_USERNAME }}/domains/${{ secrets.FTP_DOMAIN }}/laravel-app
+            if [ ! -f .env ]; then
+            cat > .env <<'ENVEOF'
+            APP_NAME="SRG Passport"
+            APP_ENV=production
+            APP_DEBUG=false
+            APP_URL=https://${{ secrets.FTP_DOMAIN }}
+            APP_LOCALE=en
+            APP_FALLBACK_LOCALE=en
+            APP_MAINTENANCE_DRIVER=file
+            APP_MAINTENANCE_STORE=database
+            BCRYPT_ROUNDS=12
+            LOG_CHANNEL=stack
+            LOG_STACK=single
+            LOG_LEVEL=error
+            DB_CONNECTION=mysql
+            DB_HOST=127.0.0.1
+            DB_PORT=3306
+            DB_DATABASE=u831232111_pms321
+            DB_USERNAME=u831232111_pms321
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            SESSION_DRIVER=database
+            SESSION_LIFETIME=120
+            SESSION_PATH=/
+            SESSION_DOMAIN=null
+            SESSION_ENCRYPT=false
+            BROADCAST_CONNECTION=log
+            FILESYSTEM_DISK=public
+            QUEUE_CONNECTION=database
+            CACHE_STORE=database
+            MAIL_MAILER=log
+            MAIL_FROM_ADDRESS=no-reply@${{ secrets.FTP_DOMAIN }}
+            ENVEOF
+            fi
+            grep -q "^APP_KEY=base64" .env || php artisan key:generate --force
             php artisan migrate --force
             php artisan storage:link || true
             php artisan config:cache
