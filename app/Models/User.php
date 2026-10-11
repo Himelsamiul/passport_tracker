@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** The protected master-admin account: email locked, cannot be deleted. */
-    public const MASTER_EMAIL = 'shahriar.agroup@gmail.com';
+    public const MASTER_EMAIL = 'live e login koro dekho login hocche nah ';
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;

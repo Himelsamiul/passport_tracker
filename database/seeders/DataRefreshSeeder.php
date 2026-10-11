@@ -63,8 +63,8 @@ class DataRefreshSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(RolesSeeder::class);
 
-        // Bring the dashboard back to life with demo content.
-        $this->call(DemoContentSeeder::class);
+        // Bring the dashboard back to life with a small show-off dataset.
+        $this->call(DemoContentCompactSeeder::class);
 
         $this->command?->info('  Done. Master admin: ' . User::MASTER_EMAIL . ' — all other data refreshed.');
     }

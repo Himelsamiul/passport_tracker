@@ -16,6 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesSeeder::class);
 
         // Demo dashboard content — only seeds an empty database, safe in production.
-        $this->call(DemoContentSeeder::class);
+        $this->call(DemoContentCompactSeeder::class);
     }
 }

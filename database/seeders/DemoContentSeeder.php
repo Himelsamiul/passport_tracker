@@ -21,6 +21,15 @@ use Illuminate\Support\Carbon;
  */
 class DemoContentSeeder extends Seeder
 {
+    /**
+     * Passports seeded per month. Compact mode (DemoContentCompactSeeder)
+     * seeds a small show-off dataset; the default seeds a fuller one.
+     */
+    protected function passportsPerMonth(): int
+    {
+        return 10;
+    }
+
     public function run(): void
     {
         // Never overwrite real passports — seed only when the registry is empty.
@@ -81,9 +90,9 @@ class DemoContentSeeder extends Seeder
         $serial = 1;
         $createdIds = [];
 
-        // 60 passports, ~10 per month
+        // Passports spread across the last 6 months
         for ($monthsAgo = 5; $monthsAgo >= 0; $monthsAgo--) {
-            for ($i = 0; $i < 10; $i++) {
+            for ($i = 0; $i < $this->passportsPerMonth(); $i++) {
                 $name = $firstNames[array_rand($firstNames)] . ' ' . $lastNames[array_rand($lastNames)];
                 $when = $createdAt($monthsAgo, rand(1, 27));
 
