@@ -13,7 +13,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>@yield('page-title', 'Dashboard') · Passport MS</title>
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1322">
     <meta name="robots" content="noindex">
 
     <!-- Inter -->
@@ -35,7 +36,7 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17/dist/sweetalert2.min.css" rel="stylesheet">
 
     <!-- Admin design system -->
-    <link href="{{ asset('css/theme.css') }}?v=1" rel="stylesheet">
+    <link href="{{ asset('css/theme.css') }}?v=3" rel="stylesheet">
 
     @stack('styles')
 </head>

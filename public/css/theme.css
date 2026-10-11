@@ -1393,3 +1393,136 @@ body.light-mode .avatar { box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08); }
 body.light-mode .table tbody td { color: var(--text-soft); }
 body.light-mode .btn-light { background: var(--card-3); color: var(--text); border-color: var(--line); }
 body.light-mode .btn-light:hover { background: var(--line-strong); }
+
+/* --------------------------------------------------------------------------
+   22. Mobile experience — feel like a real mobile app
+   -------------------------------------------------------------------------- */
+html { -webkit-text-size-adjust: 100%; }
+
+body.app-body, body.login-page {
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* Scroll shadows on wide tables (uses background-attachment: local) */
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  background:
+    linear-gradient(to right, var(--card) 30%, rgba(0, 0, 0, 0)) left center,
+    linear-gradient(to left, var(--card) 30%, rgba(0, 0, 0, 0)) right center,
+    linear-gradient(to right, rgba(6, 10, 20, 0.35), rgba(0, 0, 0, 0)) left center / 22px 100%,
+    linear-gradient(to left, rgba(6, 10, 20, 0.35), rgba(0, 0, 0, 0)) right center / 22px 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+}
+body.light-mode .table-responsive {
+  background-image:
+    linear-gradient(to right, #ffffff 30%, rgba(0, 0, 0, 0)) left center,
+    linear-gradient(to left, #ffffff 30%, rgba(0, 0, 0, 0)) right center,
+    linear-gradient(to right, rgba(15, 23, 42, 0.18), rgba(0, 0, 0, 0)) left center / 22px 100%,
+    linear-gradient(to left, rgba(15, 23, 42, 0.18), rgba(0, 0, 0, 0)) right center / 22px 100%;
+}
+
+@media (max-width: 767.98px) {
+  /* 16px inputs stop iOS Safari from auto-zooming on focus */
+  .form-control, .form-select { font-size: 16px; }
+  .form-label { font-size: 0.8rem; }
+
+  /* Bigger touch targets everywhere */
+  .btn { padding: 0.58rem 1.05rem; font-size: 0.88rem; }
+  .btn-sm { padding: 0.48rem 0.8rem; font-size: 0.82rem; }
+  .btn:active { transform: scale(0.98); }
+  .sidebar-link { padding: 12px; font-size: 0.92rem; }
+  .sidebar-link i { width: 24px; flex-basis: 24px; font-size: 1rem; }
+  .signout-btn { padding: 11px; font-size: 0.9rem; }
+  .page-link { padding: 0.55rem 0.9rem; font-size: 0.86rem; }
+  .preset { padding: 9px 16px; font-size: 0.82rem; }
+  .dropdown-item { padding: 0.65rem 0.8rem; font-size: 0.9rem; }
+  .notif-item { padding: 12px 16px; }
+
+  /* Header — tighter but thumb-friendly */
+  .app-header { padding: 8px 12px; gap: 10px; }
+  .header-actions { gap: 7px; }
+  .header-icon-btn { width: 40px; height: 40px; font-size: 1rem; }
+  .header-user { padding: 4px; }
+  .header-user .avatar-sm { width: 34px; height: 34px; flex-basis: 34px; }
+  .page-title { font-size: 1.02rem; }
+
+  /* Sidebar drawer — a hair wider, safer to tap */
+  .app-sidebar { width: min(300px, 85vw); }
+  body.sidebar-open .app-sidebar { width: min(300px, 85vw); }
+
+  /* Content rhythm */
+  .app-content { padding: 14px 12px 30px; }
+  .page-head { padding: 15px 16px; border-radius: 12px; }
+  .page-head h3, .page-head h1 { font-size: 1.12rem; }
+  .page-head .btn { flex: 1 1 auto; display: inline-flex; justify-content: center; }
+  .card { border-radius: 12px; }
+  .card-body { padding: 13px; }
+  .card.p-2.p-md-3 { padding: 8px !important; }
+  .subpanel { padding: 12px; }
+
+  /* Tables: guaranteed usable scroll + compact type */
+  .table-responsive .table { min-width: 700px; margin-bottom: 0; }
+  .table { font-size: 0.82rem; }
+  .table thead th { font-size: 0.62rem; padding: 9px 10px; }
+  .table tbody td { padding: 10px 10px; }
+  .addr { max-width: 150px; }
+
+  /* Full-width filter forms */
+  .filters-form .col-auto, form .col-md-2, form .col-md-3 { min-width: 0; }
+  form .d-flex.gap-2 .btn { flex: 1 1 auto; justify-content: center; }
+
+  /* KPI grid: 2-up comfortable */
+  .kpi-card { padding: 13px 12px; gap: 10px; border-radius: 12px; }
+  .kpi-icon { width: 42px; height: 42px; flex-basis: 42px; border-radius: 11px; }
+  .kpi-value { font-size: 1.12rem; }
+  .kpi-label { font-size: 0.72rem; }
+
+  /* Quick rows & shortcuts */
+  .quick-row { padding: 12px; gap: 11px; }
+  .quick-row .qr-icon { width: 38px; height: 38px; flex-basis: 38px; }
+  .quick-row .qr-desc { white-space: normal; }
+
+  /* Detail rows (show pages) wrap gracefully */
+  .detail-row { flex-direction: column; align-items: flex-start; gap: 2px; padding: 9px 0; }
+  .detail-row .d-value { text-align: left; }
+
+  /* Select2 dark surfaces match mobile sizing */
+  .select2-container--default .select2-selection--single .select2-selection__rendered { font-size: 16px; }
+
+  /* Login */
+  .login-form-side { padding: 26px 16px 34px; align-items: flex-start; }
+  .login-card { padding: 24px 20px 22px; border-radius: 15px; }
+  .login-title { font-size: 1.3rem; }
+
+  /* Notif dropdown fills narrow screens */
+  .notif-menu { width: min(360px, calc(100vw - 20px)); }
+
+  /* Footer stays subtle */
+  .app-footer { padding: 13px 14px 17px; font-size: 0.7rem; flex-wrap: wrap; text-align: center; }
+
+  /* iOS safe areas (notch/home bar) */
+  .app-header { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+  .app-content { padding-bottom: max(26px, env(safe-area-inset-bottom)); }
+}
+
+/* Small phones (≤380px): KPIs single column, tighter tables */
+@media (max-width: 380px) {
+  .kpi-card { flex-direction: row; }
+  .table-responsive .table { min-width: 620px; }
+  .page-title { font-size: 0.95rem; }
+}
+
+/* Short landscape phones: keep the header lean */
+@media (max-width: 915px) and (orientation: landscape) {
+  .app-header { min-height: 56px; }
+  .page-subtitle { display: none; }
+}
+
+/* Tablet portrait (768–991px): roomier content, drawer still available */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .app-content { padding: 20px 18px 30px; }
+  .table-responsive .table { min-width: 760px; }
+}
