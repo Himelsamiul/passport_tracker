@@ -8,10 +8,48 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     // Show list
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::latest()->get();
-        return view('backend.pages.categories.index', compact('categories'));
+        // Filters: q, status (active|inactive), date range, sort_by, per_page
+        $search   = trim((string) $request->query('q', ''));
+        $status   = (string) $request->query('status', '');
+        $dateFrom = (string) $request->query('date_from', '');
+        $dateTo   = (string) $request->query('date_to', '');
+        $sortBy   = (string) $request->query('sort_by', 'latest');
+
+        $q = Category::query();
+
+        if ($search !== '') {
+            $q->where('name', 'like', "%{$search}%");
+        }
+
+        if ($status !== '') {
+            $q->where('status', $status);
+        }
+
+        if ($dateFrom !== '') {
+            $q->whereDate('created_at', '>=', $dateFrom);
+        }
+        if ($dateTo !== '') {
+            $q->whereDate('created_at', '<=', $dateTo);
+        }
+
+        match ($sortBy) {
+            'oldest'  => $q->orderBy('created_at'),
+            'name_az' => $q->orderBy('name'),
+            'name_za' => $q->orderByDesc('name'),
+            default   => $q->latest(),
+        };
+
+        $perPage = in_array((int) $request->query('per_page'), [10, 25, 50, 100], true)
+            ? (int) $request->query('per_page')
+            : 25;
+
+        $categories = $q->paginate($perPage)->withQueryString();
+
+        return view('backend.pages.categories.index', compact(
+            'categories', 'search', 'status', 'dateFrom', 'dateTo', 'sortBy', 'perPage'
+        ));
     }
 
     // Create form

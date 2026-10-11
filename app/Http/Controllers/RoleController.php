@@ -20,11 +20,16 @@ class RoleController extends Controller
         abort_unless(Access::admin()?->role_id === null, 403, 'Super admin access only.');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return view('backend.pages.admin.roles.index', [
-            'roles' => Role::withCount('users')->orderBy('id')->get(),
-        ]);
+        $search = trim((string) $request->query('q', ''));
+
+        $roles = Role::withCount('users')
+            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orderBy('id')
+            ->get();
+
+        return view('backend.pages.admin.roles.index', compact('roles', 'search'));
     }
 
     public function create()

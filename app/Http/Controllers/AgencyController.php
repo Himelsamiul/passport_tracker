@@ -8,10 +8,60 @@ use App\Models\Category;
 class AgencyController extends Controller
 {
     // LIST
-    public function index()
+    public function index(Request $request)
     {
-        $agencies = Agency::latest()->get();
-        return view('backend.pages.agencies.index', compact('agencies'));
+        // Filters: q, status (ACTIVE|INACTIVE), category, date range, sort_by, per_page
+        $search   = trim((string) $request->query('q', ''));
+        $status   = (string) $request->query('status', '');
+        $categoryId = $request->query('category_id', '');
+        $dateFrom = (string) $request->query('date_from', '');
+        $dateTo   = (string) $request->query('date_to', '');
+        $sortBy   = (string) $request->query('sort_by', 'latest');
+
+        $q = Agency::with('category:id,name');
+
+        if ($search !== '') {
+            $q->where(function ($qq) use ($search) {
+                $qq->where('name', 'like', "%{$search}%")
+                    ->orWhere('contact_person', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status !== '') {
+            $q->where('status', $status);
+        }
+
+        if ($categoryId !== '') {
+            $q->where('category_id', $categoryId);
+        }
+
+        if ($dateFrom !== '') {
+            $q->whereDate('created_at', '>=', $dateFrom);
+        }
+        if ($dateTo !== '') {
+            $q->whereDate('created_at', '<=', $dateTo);
+        }
+
+        match ($sortBy) {
+            'oldest'  => $q->orderBy('created_at'),
+            'name_az' => $q->orderBy('name'),
+            'name_za' => $q->orderByDesc('name'),
+            default   => $q->latest(),
+        };
+
+        $perPage = in_array((int) $request->query('per_page'), [10, 25, 50, 100], true)
+            ? (int) $request->query('per_page')
+            : 25;
+
+        $agencies = $q->paginate($perPage)->withQueryString();
+        $categories = \App\Models\Category::orderBy('name')->get(['id', 'name']);
+
+        return view('backend.pages.agencies.index', compact(
+            'agencies', 'categories', 'search', 'status', 'categoryId', 'dateFrom', 'dateTo', 'sortBy', 'perPage'
+        ));
     }
 
     // CREATE FORM

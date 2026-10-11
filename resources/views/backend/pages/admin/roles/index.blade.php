@@ -26,6 +26,20 @@
   @if(session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif
   @if(session('error'))   <div class="alert alert-danger">{{ session('error') }}</div> @endif
 
+  {{-- Quick search --}}
+  <form method="GET" class="card p-2 p-md-3 mb-3">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <div class="input-group flex-grow-1" style="min-width:220px;max-width:420px">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input type="text" name="q" value="{{ $search }}" class="form-control" placeholder="Search roles by name">
+      </div>
+      <button type="submit" class="btn btn-apply px-3"><i class="fas fa-filter me-1"></i> Search</button>
+      @if ($search !== '')
+        <a href="{{ route('admin.roles.index') }}" class="btn btn-reset px-3"><i class="fas fa-rotate-left me-1"></i> Reset</a>
+      @endif
+    </div>
+  </form>
+
   <div class="card p-2 p-md-3">
     <div class="table-responsive">
       <table class="table align-middle">

@@ -6,6 +6,7 @@
 @section('content')
 {{-- ============================================================
      ডিজাইন নোট (এজেন্সি লিস্টে যা কাজ হয়েছে):
+     • নতুন ফিল্টার কার্ড: সার্চ, ক্যাটাগরি, স্ট্যাটাস, তারিখ রেঞ্জ, সর্ট, পার-পেজ + পেজিনেশন।
      • লাইট টেবিল-স্ক্রল স্টাইল বাদ — নতুন ডার্ক থিমে কার্ডে রেসপনসিভ টেবিল।
      • হেডারে "Add Agency" বাটন; স্ট্যাটাস সফট ব্যাজ; টুলটিপ আগের মতো।
      • "used/locked" চেক (প্রসেসিংয়ে লিংকড কিনা) লজিক অক্ষুণ্ণ।
@@ -28,6 +29,84 @@
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
+
+  {{-- FILTERS: search + category + status + date range + sort + per page --}}
+  <form method="GET" id="filtersForm" class="card p-3 p-md-4 mb-3">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <div class="section-title mb-0"><i class="fas fa-sliders"></i> Filter &amp; Search</div>
+      <a href="{{ route('agencies.index') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-rotate-left me-1"></i> Reset
+      </a>
+    </div>
+
+    <div class="row g-3 align-items-end">
+      <div class="col-12 col-lg-3">
+        <label class="form-label">Search</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" name="q" value="{{ $search }}" class="form-control" placeholder="Name / Contact / Phone / Email">
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-2">
+        <label class="form-label">Category</label>
+        <select name="category_id" class="form-select">
+          <option value="">All</option>
+          @foreach ($categories as $cat)
+            <option value="{{ $cat->id }}" {{ $categoryId==$cat->id?'selected':'' }}>{{ $cat->name }}</option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="col-6 col-lg-2">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+          <option value="">All</option>
+          <option value="ACTIVE"   {{ $status==='ACTIVE'?'selected':'' }}>Active</option>
+          <option value="INACTIVE" {{ $status==='INACTIVE'?'selected':'' }}>Inactive</option>
+        </select>
+      </div>
+
+      <div class="col-6 col-lg-2">
+        <label class="form-label">Sort</label>
+        <select name="sort_by" class="form-select auto-submit">
+          <option value="latest"  {{ $sortBy==='latest'?'selected':'' }}>Latest</option>
+          <option value="oldest"  {{ $sortBy==='oldest'?'selected':'' }}>Oldest</option>
+          <option value="name_az" {{ $sortBy==='name_az'?'selected':'' }}>Name A→Z</option>
+          <option value="name_za" {{ $sortBy==='name_za'?'selected':'' }}>Name Z→A</option>
+        </select>
+      </div>
+
+      <div class="col-6 col-lg-2">
+        <label class="form-label">Per Page</label>
+        <select name="per_page" class="form-select auto-submit">
+          @foreach([10,25,50,100] as $pp)
+            <option value="{{ $pp }}" {{ (int)$perPage===$pp?'selected':'' }}>{{ $pp }}</option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="col-12 col-lg-1" style="min-width:150px">
+        <label class="form-label">Date Range</label>
+        <input type="text" id="dateRange" class="form-control" placeholder="Range"
+               value="{{ $dateFrom && $dateTo ? \Carbon\Carbon::parse($dateFrom)->format('d M Y').' to '.\Carbon\Carbon::parse($dateTo)->format('d M Y') : '' }}">
+        <input type="hidden" name="date_from" id="date_from" value="{{ $dateFrom }}">
+        <input type="hidden" name="date_to" id="date_to" value="{{ $dateTo }}">
+      </div>
+
+      <div class="col-12 d-flex flex-wrap gap-2">
+        <button type="button" class="preset" data-preset="today">Today</button>
+        <button type="button" class="preset" data-preset="7">Last 7 days</button>
+        <button type="button" class="preset" data-preset="30">Last 30 days</button>
+        <button type="button" class="preset" data-preset="month">This month</button>
+        <button type="button" class="preset" id="clearDate">Clear date</button>
+      </div>
+
+      <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-apply px-4"><i class="fas fa-filter me-1"></i> Apply Filters</button>
+      </div>
+    </div>
+  </form>
 
   <div class="card p-2 p-md-3">
     <div class="table-responsive">
@@ -55,7 +134,7 @@
             @endphp
 
             <tr class="{{ $isUsed ? 'lock-row' : '' }}">
-              <td>{{ $key + 1 }}</td>
+              <td>{{ ($agencies->currentPage()-1)*$agencies->perPage() + $loop->iteration }}</td>
               <td class="fw-semibold">{{ $agency->name }}</td>
               <td>{{ $agency->category->name ?? 'N/A' }}</td>
               <td>{{ $agency->contact_person }}</td>
@@ -109,6 +188,79 @@
         </tbody>
       </table>
     </div>
+
+    {{-- Pagination --}}
+    <div class="mt-3 px-1 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="text-muted small">
+        Showing
+        @if($agencies->total()) {{ $agencies->firstItem() }}–{{ $agencies->lastItem() }} @else 0 @endif
+        of {{ $agencies->total() }} results
+      </div>
+      <div>{{ $agencies->links() }}</div>
+    </div>
   </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.auto-submit').forEach(function (el) {
+      el.addEventListener('change', function () {
+        document.getElementById('filtersForm').submit();
+      });
+    });
+
+    var df = document.getElementById('date_from');
+    var dt = document.getElementById('date_to');
+    var fp = flatpickr('#dateRange', {
+      mode: 'range',
+      dateFormat: 'd M Y',
+      onChange: function (sel) {
+        if (sel.length === 2) {
+          var iso = function (d) { return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+          df.value = iso(sel[0]);
+          dt.value = iso(sel[1]);
+        }
+      }
+    });
+
+    function setRange(start, end) {
+      fp.setDate([start, end], true);
+      var iso = function (d) { return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+      df.value = iso(start);
+      dt.value = iso(end);
+      document.getElementById('filtersForm').submit();
+    }
+
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    document.querySelectorAll('.preset').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.preset').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var val = btn.dataset.preset;
+        if (val === 'today') {
+          setRange(new Date(today), new Date(today));
+        } else if (val === 'month') {
+          setRange(new Date(today.getFullYear(), today.getMonth(), 1), new Date(today.getFullYear(), today.getMonth() + 1, 0));
+        } else {
+          var n = parseInt(val, 10);
+          var start = new Date(today); start.setDate(today.getDate() - (n - 1));
+          setRange(start, new Date(today));
+        }
+      });
+    });
+
+    var clearBtn = document.getElementById('clearDate');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        fp.clear();
+        df.value = '';
+        dt.value = '';
+        document.getElementById('filtersForm').submit();
+      });
+    }
+  });
+</script>
+@endpush
 @endsection

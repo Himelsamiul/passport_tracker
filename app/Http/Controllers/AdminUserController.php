@@ -19,11 +19,29 @@ class AdminUserController extends Controller
         abort_unless(Access::admin()?->role_id === null, 403, 'Super admin access only.');
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('q', ''));
+        $roleFilter = $request->query('role_id', '');
+
+        $users = User::with('role')
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(fn ($qq) => $qq->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%"));
+            })
+            ->when($roleFilter !== '', function ($q) use ($roleFilter) {
+                $roleFilter === 'none'
+                    ? $q->whereNull('role_id')
+                    : $q->where('role_id', $roleFilter);
+            })
+            ->orderBy('id')
+            ->get();
+
         return view('backend.pages.admin.users.index', [
-            'users' => User::with('role')->orderBy('id')->get(),
+            'users' => $users,
             'roles' => Role::orderBy('name')->get(),
+            'search' => $search,
+            'roleFilter' => $roleFilter,
         ]);
     }
 

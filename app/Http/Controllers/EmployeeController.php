@@ -8,10 +8,48 @@ use Illuminate\Http\Request;
 class EmployeeController extends Controller
 {
     // 🟢 LIST ALL EMPLOYEES
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::latest()->get();
-        return view('backend.pages.employees.index', compact('employees'));
+        // Filters: q, date_from/date_to (created_at), sort_by, per_page
+        $search   = trim((string) $request->query('q', ''));
+        $dateFrom = (string) $request->query('date_from', '');
+        $dateTo   = (string) $request->query('date_to', '');
+        $sortBy   = (string) $request->query('sort_by', 'latest');
+
+        $q = Employee::query();
+
+        if ($search !== '') {
+            $q->where(function ($qq) use ($search) {
+                $qq->where('name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('designation', 'like', "%{$search}%");
+            });
+        }
+
+        if ($dateFrom !== '') {
+            $q->whereDate('created_at', '>=', $dateFrom);
+        }
+        if ($dateTo !== '') {
+            $q->whereDate('created_at', '<=', $dateTo);
+        }
+
+        match ($sortBy) {
+            'oldest'  => $q->orderBy('created_at'),
+            'name_az' => $q->orderBy('name'),
+            'name_za' => $q->orderByDesc('name'),
+            default   => $q->latest(),
+        };
+
+        $perPage = in_array((int) $request->query('per_page'), [10, 25, 50, 100], true)
+            ? (int) $request->query('per_page')
+            : 25;
+
+        $employees = $q->paginate($perPage)->withQueryString();
+
+        return view('backend.pages.employees.index', compact(
+            'employees', 'search', 'dateFrom', 'dateTo', 'sortBy', 'perPage'
+        ));
     }
 
     // 🟢 SHOW CREATE FORM
