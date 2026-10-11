@@ -1205,8 +1205,40 @@ span.flatpickr-weekday { color: var(--muted); }
 
 .chart-wrap { position: relative; width: 100%; }
 
-/* Notify toast z-index safety */
-.notify { z-index: 9999; justify-content: flex-start; }
+/* Notify toast z-index safety + defensive styling.
+   The package's toast markup uses Tailwind utility classes which this
+   project doesn't ship — without these rules an unstyled toast block can
+   appear full-width below the footer. This keeps it a small fixed toast. */
+#laravel-notify:empty { display: none; }
+.notify.fixed,
+div.notify[class*="inset-0"] {
+  position: fixed !important;
+  inset: auto 18px 18px auto !important;
+  z-index: 9999 !important;
+  width: min(360px, calc(100vw - 36px)) !important;
+  display: block !important;
+  background: transparent !important;
+  pointer-events: none;
+}
+.notify.fixed > div {
+  pointer-events: auto;
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--line) !important;
+  border-top: 3px solid var(--green) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-pop) !important;
+  overflow: hidden;
+}
+.notify.fixed .p-4 { padding: 13px 15px !important; }
+.notify.fixed .flex.items-start,
+.notify.fixed [class*="flex items-start"] { display: flex !important; gap: 12px !important; align-items: flex-start !important; }
+.notify.fixed .text-slate-900,
+.notify.fixed .text-slate-700,
+.notify.fixed .text-slate-500 { color: var(--text-soft) !important; }
+.notify.fixed .text-sm { font-size: 0.84rem !important; }
+.notify.fixed .font-medium { font-weight: 600 !important; }
+.notify.fixed svg { width: 20px; height: 20px; flex: 0 0 20px; color: var(--green); }
+.notify.fixed [x-show="false"], .notify.fixed [style*="display: none"] { display: none !important; }
 
 /* Footer strip */
 .app-footer {

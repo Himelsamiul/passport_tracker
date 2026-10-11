@@ -43,33 +43,38 @@
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 10px 24px -10px rgba(78,134,232,.7);
     }
     .lbp-name { font-size: 1.02rem; font-weight: 650; letter-spacing: -0.01em; color: #fff; }
-    .login-mobile-brand { display: flex; align-items: center; gap: 11px; margin-bottom: 22px; }
-    .login-mobile-brand .lmb-text { font-weight: 650; font-size: .95rem; color: var(--text); }
 
     body.login-page .login-form-side .login-card { padding: 34px 32px 30px; }
 
-    /* Left brand panel — assembled from tokens */
+    /* Left brand panel — visible on ALL screens (hero on mobile, column on desktop) */
     .login-brand-panel {
       position: relative;
       overflow: hidden;
-      display: none;
+      display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding: 52px 56px;
+      justify-content: flex-start;
+      gap: 24px;
+      padding: 32px 22px 28px;
       color: #fff;
       background:
         radial-gradient(90% 70% at 110% -10%, rgba(78, 134, 232, 0.35) 0%, transparent 55%),
         radial-gradient(70% 60% at -15% 110%, rgba(124, 95, 240, 0.28) 0%, transparent 55%),
         linear-gradient(165deg, #123a72 0%, var(--accent-deep) 48%, #0a2647 100%);
     }
-    @media (min-width: 992px) { .login-brand-panel { display: flex; } }
+    @media (min-width: 992px) {
+      .login-brand-panel {
+        justify-content: space-between;
+        gap: 0;
+        padding: 52px 56px;
+      }
+    }
     .lbp-glow { pointer-events:none; position:absolute; border-radius:50%; filter:blur(70px); }
     .lbp-glow-1 { width:320px; height:320px; top:-110px; right:-90px; background:rgba(255,255,255,.09); }
     .lbp-glow-2 { width:380px; height:380px; bottom:-150px; left:-110px; background:rgba(56,200,240,.14); }
     .lbp-brand { position:relative; display:flex; align-items:center; gap:13px; }
     .lbp-headline {
       position: relative;
-      font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+      font-size: clamp(1.4rem, 5.4vw, 2.3rem);
       font-weight: 700;
       line-height: 1.22;
       letter-spacing: -0.025em;
@@ -78,13 +83,13 @@
     }
     .lbp-tagline {
       position: relative;
-      margin: 14px 0 0;
+      margin: 12px 0 0;
       max-width: 30em;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       line-height: 1.65;
       color: rgba(255, 255, 255, 0.62);
     }
-    .login-features { position: relative; display: grid; gap: 18px; }
+    .login-features { position: relative; display: grid; gap: 15px; }
     .login-feature { display: flex; gap: 13px; align-items: flex-start; }
     .login-feature .lf-icon {
       width: 38px; height: 38px;
@@ -157,12 +162,6 @@
   {{-- ============ Right: form ============ --}}
   <div class="login-form-side">
     <div style="width:100%;max-width:420px;">
-      {{-- Mobile brand (panel is hidden on small screens) — icon tile, no logo image --}}
-      <div class="login-mobile-brand d-lg-none">
-        <span class="login-icon-tile dark"><i class="fas fa-suitcase-rolling"></i></span>
-        <span class="lmb-text">Passport MS</span>
-      </div>
-
       <div class="login-card">
         <span class="login-badge"><i class="fas fa-shield-halved"></i> Admin access only</span>
         <h1 class="login-title">Welcome back</h1>
@@ -193,7 +192,11 @@
             </div>
           </div>
 
-          <div class="d-flex justify-content-end mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div class="form-check m-0">
+              <input class="form-check-input" type="checkbox" id="remember" name="remember" value="1">
+              <label class="form-check-label" for="remember" style="font-size:.8rem">Remember me</label>
+            </div>
             <a href="#" class="text-decoration-none" style="font-size:.78rem;font-weight:600">Forgot password?</a>
           </div>
 

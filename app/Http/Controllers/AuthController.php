@@ -39,6 +39,12 @@ class AuthController extends Controller
             ((string)($user->visible_password ?? '')) === $pass // optional visible_password
         )) {
             session(['user' => $user]);
+
+            // "Remember me": stretch the session cookie to 30 days for this login.
+            if ($request->boolean('remember')) {
+                config(['session.lifetime' => 60 * 24 * 30]);
+            }
+
             Audit::log('login', 'auth', 'Signed in');
             return redirect()->route('dashboard');
         }
@@ -50,6 +56,12 @@ class AuthController extends Controller
                 return back()->with('error', 'Your account is inactive. Please contact the admin.');
             }
             session(['user' => $reg]); // store registration model in session
+
+            // "Remember me": stretch the session cookie to 30 days for this login.
+            if ($request->boolean('remember')) {
+                config(['session.lifetime' => 60 * 24 * 30]);
+            }
+
             Audit::log('login', 'auth', 'Signed in (registration account)');
             return redirect()->route('dashboard');
         }
