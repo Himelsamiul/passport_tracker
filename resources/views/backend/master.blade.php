@@ -38,6 +38,9 @@
     <!-- Admin design system -->
     <link href="{{ asset('css/theme.css') }}?v=3" rel="stylesheet">
 
+    <!-- Flatpickr (date-range filters on list/report pages) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     @stack('styles')
 </head>
 
@@ -75,6 +78,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     @stack('scripts')
 
