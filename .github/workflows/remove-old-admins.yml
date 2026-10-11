@@ -1,0 +1,38 @@
+name: Remove old admins (live)
+
+# Deletes every panel login except the master admin
+# (shahriar.agroup@gmail.com) from the live server. Module data
+# (passports/processings/collections/etc.) is NOT touched.
+# Type PRUNE in the confirm box to run.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type PRUNE to confirm removing non-master admins'
+        required: true
+        default: ''
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard — type PRUNE to confirm
+        if: ${{ github.event.inputs.confirm != 'PRUNE' }}
+        run: |
+          echo "Confirmation word mismatch — aborting. Type PRUNE in the confirm box."
+          exit 1
+
+      - name: Run PruneOldAdminsSeeder on live (SSH)
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script_stop: true
+          script: |
+            cd /home/${{ secrets.FTP_USERNAME }}/domains/${{ secrets.FTP_DOMAIN }}/laravel-app
+            php artisan db:seed --class=PruneOldAdminsSeeder --force
