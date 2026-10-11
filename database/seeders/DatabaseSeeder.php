@@ -11,8 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Call your custom seeder file (UserSeeder)
+        // Master admin only (shahriar.agroup@gmail.com) + starter roles
         $this->call(UserSeeder::class);
+        $this->call(RolesSeeder::class);
 
         // Demo dashboard content — only seeds an empty database, safe in production.
         $this->call(DemoContentSeeder::class);

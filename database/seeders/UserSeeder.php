@@ -2,27 +2,29 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+/*
+ * ফিচার নোট (মাস্টার অ্যাডমিন সিডার):
+ * • প্ল্যাটফর্মে একজনই মাস্টার অ্যাডমিন — shahriar.agroup@gmail.com (নাম: shah alom)।
+ * • এই অ্যাকাউন্টের ইমেইল কখনো বদলানো যাবে না, ডিলিটও করা যাবে না
+ *   (AdminUserController-এ লক করা)। এর রোল = Master Admin (role_id null = ফুল অ্যাকসেস)।
+ * • অন্য সব ইউজার DataRefreshSeeder রিফ্রেশের সময় মুছে যায়।
+ */
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admins = [
-            ['name' => 'Admin One',   'email' => 'admin1@gmail.com', 'password' => '1111'],
-            ['name' => 'Admin Two',   'email' => 'admin2@gmail.com', 'password' => '2222'],
-            ['name' => 'Admin Three', 'email' => 'admin3@gmail.com', 'password' => '3333'],
-            ['name' => 'Admin Four',  'email' => 'admin4@gmail.com', 'password' => '4444'],
-            ['name' => 'Admin Five',  'email' => 'admin5@gmail.com', 'password' => '5555'],
-            ['name' => 'Admin Six',   'email' => 'admin6@gmail.com', 'password' => '6666'],
-        ];
-
-        foreach ($admins as $admin) {
-            User::updateOrCreate(
-                ['email' => $admin['email']],
-                ['name' => $admin['name'], 'password' => $admin['password']]
-            );
-        }
+        User::updateOrCreate(
+            ['email' => User::MASTER_EMAIL],
+            [
+                'name' => 'shah alom',
+                'password' => Hash::make('Allaha@2030#'),
+                'role_id' => null, // Master Admin — full access, cannot be downgraded
+            ]
+        );
     }
 }

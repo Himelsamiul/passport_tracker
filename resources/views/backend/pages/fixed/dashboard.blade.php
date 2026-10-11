@@ -153,10 +153,10 @@
         <div class="card-body">
           <div class="section-title"><i class="fas fa-circle-info"></i> Status Guide</div>
           <ul class="status-guide">
-            <li style="--c:var(--amber);"><strong>Pending</strong> — আবেদন গ্রহণ হয়েছে, প্রক্রিয়া শুরু বাকি।</li>
-            <li style="--c:var(--cyan);"><strong>Ongoing</strong> — ডকুমেন্ট/ভেরিফিকেশন/সাবমিশন চলমান।</li>
-            <li style="--c:var(--green);"><strong>Done</strong> — কাজ সম্পন্ন; ডেলিভারি/কলেক্টের জন্য প্রস্তুত।</li>
-            <li style="--c:var(--red);"><strong>Rejected</strong> — ডকুমেন্ট/নীতিগত কারণে বাতিল।</li>
+            <li style="--c:var(--amber);"><strong>Pending</strong> — Application received; processing has not started yet.</li>
+            <li style="--c:var(--cyan);"><strong>Ongoing</strong> — Documents, verification and submission are in progress.</li>
+            <li style="--c:var(--green);"><strong>Done</strong> — Work completed; ready for collection/delivery.</li>
+            <li style="--c:var(--red);"><strong>Rejected</strong> — Rejected due to documents or policy reasons.</li>
           </ul>
         </div>
       </div>

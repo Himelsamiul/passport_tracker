@@ -43,7 +43,11 @@
           </div>
           <div class="col-md-6">
             <label class="form-label">Email <span class="text-danger">*</span></label>
-            <input type="email" name="email" class="form-control" required value="{{ old('email', $user->email) }}">
+            <input type="email" name="email" class="form-control" required value="{{ old('email', $user->email) }}"
+                   @if ($user->isMaster()) readonly @endif>
+            @if ($user->isMaster())
+              <small class="text-muted" style="font-size:.72rem"><i class="fas fa-lock me-1"></i>The master admin email is locked and cannot be changed.</small>
+            @endif
           </div>
           <div class="col-md-6">
             <label class="form-label">New Password</label>
@@ -51,12 +55,16 @@
           </div>
           <div class="col-md-6">
             <label class="form-label">Role</label>
-            <select name="role_id" class="form-select">
-              <option value="" @selected(old('role_id', $user->role_id) === null || old('role_id') === '')>— No role (Super Admin) —</option>
-              @foreach ($roles as $role)
-                <option value="{{ $role->id }}" @selected(old('role_id', $user->role_id) == $role->id)>{{ $role->name }}</option>
-              @endforeach
-            </select>
+            @if ($user->isMaster())
+              <input type="text" class="form-control" value="Master Admin (locked)" readonly>
+            @else
+              <select name="role_id" class="form-select">
+                <option value="" @selected(old('role_id', $user->role_id) === null || old('role_id') === '')>— No role (Master Admin access) —</option>
+                @foreach ($roles as $role)
+                  <option value="{{ $role->id }}" @selected(old('role_id', $user->role_id) == $role->id)>{{ $role->name }}</option>
+                @endforeach
+              </select>
+            @endif
           </div>
         </div>
 

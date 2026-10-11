@@ -10,8 +10,16 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    /** The protected master-admin account: email locked, cannot be deleted. */
+    public const MASTER_EMAIL = 'shahriar.agroup@gmail.com';
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    public function isMaster(): bool
+    {
+        return $this->email === self::MASTER_EMAIL;
+    }
 
     /**
      * The attributes that are mass assignable.

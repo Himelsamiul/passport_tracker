@@ -79,8 +79,16 @@ class AdminUserController extends Controller
         $data = $this->validated($request, $user->id, withPassword: true);
 
         $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->role_id = $data['role_id'];
+
+        // The master admin's identity is locked: email never changes and it
+        // always stays role-less (full access).
+        if ($user->isMaster()) {
+            $user->role_id = null;
+        } else {
+            $user->email = $data['email'];
+            $user->role_id = $data['role_id'];
+        }
+
         if (! empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
@@ -93,12 +101,18 @@ class AdminUserController extends Controller
     {
         $current = Access::admin();
 
+        // The master admin account can never be deleted — by anyone.
+        if ($user->isMaster()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'The master admin account cannot be deleted.');
+        }
+
         if ($current && $user->id === $current->id) {
             return redirect()->route('admin.users.index')->with('error', 'You cannot delete your own account.');
         }
 
         if ($user->role_id === null && User::whereNull('role_id')->count() === 1) {
-            return redirect()->route('admin.users.index')->with('error', 'At least one super admin must remain.');
+            return redirect()->route('admin.users.index')->with('error', 'At least one master admin must remain.');
         }
 
         $user->delete();
@@ -112,6 +126,12 @@ class AdminUserController extends Controller
         $emailRule = 'required|email|max:190|unique:users,email';
         if ($ignoreId) {
             $emailRule .= ',' . $ignoreId;
+        }
+
+        $isMasterEdit = $ignoreId && User::find($ignoreId)?->isMaster();
+        if ($isMasterEdit) {
+            // Locked identity: keep the master email as-is (must still pass rules).
+            $request->merge(['email' => User::MASTER_EMAIL]);
         }
 
         $rules = [

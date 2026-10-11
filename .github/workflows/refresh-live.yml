@@ -1,0 +1,40 @@
+name: Refresh live data
+
+# ⚠️ Manual reset of the live database content. Run ONLY when you really want
+# to wipe live data: it deletes all module data (passports, processings,
+# collections, directory, registrations, logs) and every admin except the
+# master admin (shahriar.agroup@gmail.com / role: Master Admin), then re-seeds
+# starter roles and demo content.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type REFRESH to confirm the wipe + re-seed'
+        required: true
+        default: ''
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard — type REFRESH to confirm
+        if: ${{ github.event.inputs.confirm != 'REFRESH' }}
+        run: |
+          echo "Confirmation word mismatch — aborting. Type REFRESH in the confirm box."
+          exit 1
+
+      - name: Run DataRefreshSeeder on live (SSH)
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script_stop: true
+          script: |
+            cd /home/${{ secrets.FTP_USERNAME }}/domains/${{ secrets.FTP_DOMAIN }}/laravel-app
+            php artisan db:seed --class=DataRefreshSeeder --force
+            php artisan view:clear && php artisan view:cache

@@ -53,7 +53,7 @@ class Audit
             ActivityLog::create([
                 'user_id' => $user?->id,
                 'user_name' => $user?->name ?? $fallbackName ?? 'System',
-                'role_name' => $user?->role?->name ?? ($user && $user->role_id === null ? 'Super Admin' : null),
+                'role_name' => $user?->role?->name ?? ($user && $user->role_id === null ? 'Master Admin' : null),
                 'action' => $action,
                 'module' => $module,
                 'description' => $description,

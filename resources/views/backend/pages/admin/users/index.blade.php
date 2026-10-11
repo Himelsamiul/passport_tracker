@@ -34,7 +34,7 @@
       </div>
       <select name="role_id" class="form-select" style="max-width:220px" onchange="this.form.submit()">
         <option value="">All roles</option>
-        <option value="none" {{ $roleFilter==='none'?'selected':'' }}>Super Admin (no role)</option>
+        <option value="none" {{ $roleFilter==='none'?'selected':'' }}>Master Admin (no role)</option>
         @foreach ($roles as $role)
           <option value="{{ $role->id }}" {{ $roleFilter==$role->id?'selected':'' }}>{{ $role->name }}</option>
         @endforeach
@@ -73,15 +73,20 @@
                 @if ($u->role)
                   <span class="badge bg-primary">{{ $u->role->name }}</span>
                 @else
-                  <span class="badge bg-success">Super Admin</span>
+                  <span class="badge bg-success">Master Admin</span>
                 @endif
               </td>
               <td>{{ $u->created_at?->format('d M Y') }}</td>
               <td>
                 <div class="d-flex gap-1">
                   <a href="{{ route('admin.users.edit', $u) }}" class="btn btn-sm btn-warning"><i class="fas fa-pen"></i> Edit</a>
-                  <a href="{{ route('admin.users.destroy', $u) }}" class="btn btn-sm btn-danger"
-                     onclick="return confirm('Delete this admin user?')"><i class="fas fa-trash-can"></i> Delete</a>
+                  @if (! $u->isMaster())
+                    <a href="{{ route('admin.users.destroy', $u) }}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Delete this admin user?')"><i class="fas fa-trash-can"></i> Delete</a>
+                  @else
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="tooltip"
+                            title="The master admin account cannot be deleted."><i class="fas fa-lock"></i></button>
+                  @endif
                 </div>
               </td>
             </tr>
