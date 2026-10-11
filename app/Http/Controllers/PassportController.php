@@ -117,9 +117,9 @@ public function show($id)
     public function store(Request $request)
     {
         $request->validate([
-            'agent_id'             => ['required', 'exists:agents,id'],
+            'agent_id'             => ['nullable', 'exists:agents,id'],
             'passport_officer_id'  => ['nullable', 'exists:passport_officers,id'],
-            'employee_id'          => ['required', 'exists:employees,id'],
+            'employee_id'          => ['nullable', 'exists:employees,id'],
             'applicant_name'       => ['required', 'string', 'max:255'],
             'address'              => ['nullable', 'string', 'max:255'],
             'phone'                => ['nullable', 'string', 'max:20'],
@@ -179,9 +179,9 @@ public function show($id)
         $passport = Passport::findOrFail($id);
 
         $request->validate([
-            'agent_id'             => ['required', 'exists:agents,id'],
+            'agent_id'             => ['nullable', 'exists:agents,id'],
             'passport_officer_id'  => ['nullable', 'exists:passport_officers,id'],
-            'employee_id'          => ['required', 'exists:employees,id'],
+            'employee_id'          => ['nullable', 'exists:employees,id'],
             'applicant_name'       => ['required', 'string', 'max:255'],
             'address'              => ['nullable', 'string', 'max:255'],
             'phone'                => ['nullable', 'string', 'max:20'],

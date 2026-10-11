@@ -104,8 +104,8 @@
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">Agent <span class="text-danger">*</span></label>
-            <select name="agent_id" class="form-select" required>
+            <label class="form-label">Agent</label>
+            <select name="agent_id" class="form-select">
               <option value="">— Select Agent —</option>
               @foreach($agents as $a)
                 <option value="{{ $a->id }}" @selected(old('agent_id')==$a->id)>{{ $a->name }}</option>
@@ -114,8 +114,8 @@
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">Passport Officer <span class="text-danger">*</span></label>
-            <select name="passport_officer_id" class="form-select" required>
+            <label class="form-label">Passport Officer</label>
+            <select name="passport_officer_id" class="form-select">
               <option value="">— Select Officer —</option>
               @foreach($officers as $o)
                 <option value="{{ $o->id }}" @selected(old('passport_officer_id')==$o->id)>{{ $o->name }}</option>
@@ -124,8 +124,8 @@
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">Passport Received By <span class="text-danger">*</span></label>
-            <select name="employee_id" class="form-select" required>
+            <label class="form-label">Passport Received By</label>
+            <select name="employee_id" class="form-select">
               <option value="">— Select Employee —</option>
               @foreach($employees as $emp)
                 <option value="{{ $emp->id }}" @selected(old('employee_id')==$emp->id)>{{ $emp->name }}</option>

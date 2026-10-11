@@ -48,8 +48,9 @@
         <div class="section-title"><i class="fas fa-handshake"></i> Stakeholder</div>
         <div class="row g-3">
           <div class="col-md-4">
-            <label class="form-label">Agent <span class="text-danger">*</span></label>
-            <select name="agent_id" class="form-select" required>
+            <label class="form-label">Agent</label>
+            <select name="agent_id" class="form-select">
+              <option value="">— No Agent —</option>
               @foreach($agents as $a)
                 <option value="{{ $a->id }}" @selected(old('agent_id', $passport->agent_id)==$a->id)>{{ $a->name }}</option>
               @endforeach
