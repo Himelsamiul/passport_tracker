@@ -150,7 +150,9 @@ jobs:
             fi
             grep -q "^APP_KEY=base64" .env || php artisan key:generate --force
             php artisan migrate --force
-            # Small show-off demo dataset + starter roles — seeders skip when data exists.
+            # Master admin (ensured every deploy) + starter roles + small
+            # show-off demo dataset (seeder skips when data exists).
+            php artisan db:seed --class=UserSeeder --force
             php artisan db:seed --class=RolesSeeder --force
             php artisan db:seed --class=DemoContentCompactSeeder --force
             php artisan config:cache
