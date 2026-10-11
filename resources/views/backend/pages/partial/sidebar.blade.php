@@ -44,6 +44,7 @@ $groups = [
         'items' => [
             ['route' => 'admin.roles.index', 'label' => 'Roles & Permissions', 'icon' => 'fa-user-lock', 'match' => 'admin.roles.*', 'perm' => 'roles.view'],
             ['route' => 'admin.users.index', 'label' => 'Admin Users',         'icon' => 'fa-users-gear','match' => 'admin.users.*', 'perm' => 'admin-users.view'],
+            ['route' => 'admin.audit.index', 'label' => 'Track Record',        'icon' => 'fa-clipboard-list', 'match' => 'admin.audit*', 'perm' => 'audit.view'],
         ],
     ],
 ];

@@ -28,6 +28,7 @@ class Access
         'collections'   => ['view', 'create', 'delete'],
         'registrations' => ['view', 'create', 'delete'],
         'reports'       => ['view'],
+        'audit'         => ['view'],
     ];
 
     public const MODULE_LABELS = [
@@ -42,6 +43,7 @@ class Access
         'collections'   => 'Collections',
         'registrations' => 'Registrations',
         'reports'       => 'Reports',
+        'audit'         => 'Track Record',
     ];
 
     public const ACTION_LABELS = [

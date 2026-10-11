@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Models\Employee;
+use App\Support\Audit;
 
 class AuthController extends Controller
 {
@@ -38,6 +39,7 @@ class AuthController extends Controller
             ((string)($user->visible_password ?? '')) === $pass // optional visible_password
         )) {
             session(['user' => $user]);
+            Audit::log('login', 'auth', 'Signed in');
             return redirect()->route('dashboard');
         }
 
@@ -48,14 +50,17 @@ class AuthController extends Controller
                 return back()->with('error', 'Your account is inactive. Please contact the admin.');
             }
             session(['user' => $reg]); // store registration model in session
+            Audit::log('login', 'auth', 'Signed in (registration account)');
             return redirect()->route('dashboard');
         }
 
+        Audit::log('login_failed', 'auth', "Failed sign-in attempt for {$email}");
         return back()->with('error', 'Invalid email or password.');
     }
 
     public function logout()
     {
+        Audit::log('logout', 'auth', 'Signed out');
         session()->forget('user');
         return redirect()->route('login');
     }

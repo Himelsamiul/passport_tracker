@@ -15,6 +15,7 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ReportExportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AuditLogController;
 
 Route::get('/login',  [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -131,5 +132,9 @@ Route::middleware(['auth.session'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('roles', RoleController::class)->except('show');
         Route::resource('users', AdminUserController::class)->except('show');
+
+        // Audit trail — grantable via roles.audit.view (super admin by default)
+        Route::get('audit', [AuditLogController::class, 'index'])
+            ->middleware('perm:audit.view')->name('audit.index');
     });
 });
