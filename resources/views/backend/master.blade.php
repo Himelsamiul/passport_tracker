@@ -65,7 +65,7 @@
             </main>
 
             <footer class="app-footer">
-                <span>&copy; {{ date('Y') }} Shahriar Worldwide Venture</span>
+                <span>&copy; {{ date('Y') }} Shahriar Aviation</span>
                 <span class="dot">·</span>
                 <span>Passport Management System</span>
             </footer>

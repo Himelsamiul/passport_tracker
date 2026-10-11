@@ -333,7 +333,7 @@
     <!-- কন্টেন্ট ব্লক ১ (অরিজিনাল টেক্সট) -->
     <div class="content-block">
         <p>পক্ষ–১: কোম্পানি<br>
-          Shahriar Worldwide Venture<br>
+          Shahriar Aviation<br>
           ঠিকানা: 7th Floor, 18/3 Ring Road, Block F, Mohammadpur, Dhaka<br>
           ফোন/হোয়াটসঅ্যাপ: +855 96 822 5091<br>
           ইমেইল: shahriar.agroup@gmail.com<br>
@@ -503,7 +503,7 @@
     <div class="w1"></div>
     <div class="w2"></div>
     <div class="foot-text">
-      <strong>Since 1998, Shahriar Group has been shaping industries with innovation, integrity, and global standards.</strong><br>
+      <strong>Since 1998, Shahriar Aviation has been shaping industries with innovation, integrity, and global standards.</strong><br>
       Our journey is built on a foundation of trust, visionary leadership, and a relentless pursuit of excellence.
     </div>
   </div>

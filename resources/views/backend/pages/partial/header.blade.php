@@ -125,7 +125,7 @@ $newestAt = $notifications->max('at') ?? 0;
             <ul class="dropdown-menu dropdown-menu-end">
                 <li class="px-3 py-2">
                     <div class="fw-semibold text-capitalize" style="font-size:.88rem">{{ $user->name ?? 'Guest User' }}</div>
-                    <div class="text-muted" style="font-size:.74rem">Shahriar Worldwide Venture</div>
+                    <div class="text-muted" style="font-size:.74rem">Shahriar Aviation</div>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>

@@ -94,7 +94,7 @@ $groups = collect($groups)
             <span class="avatar">{{ $initial }}</span>
             <div class="su-meta">
                 <div class="su-name">{{ $user->name ?? 'Guest User' }}</div>
-                <div class="su-role">Shahriar Worldwide Venture</div>
+                <div class="su-role">Shahriar Aviation</div>
             </div>
         </div>
         <a href="{{ route('logout') }}" class="signout-btn"

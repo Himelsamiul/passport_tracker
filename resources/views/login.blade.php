@@ -117,7 +117,7 @@
 
     <div class="lbp-brand">
       <span class="login-icon-tile"><i class="fas fa-suitcase-rolling"></i></span>
-      <span class="lbp-name">Shahriar Worldwide Venture</span>
+      <span class="lbp-name">Shahriar Aviation</span>
     </div>
 
     <div>
@@ -156,7 +156,7 @@
       </div>
     </div>
 
-    <p class="lbp-copy">&copy; {{ date('Y') }} Shahriar Worldwide Venture. Secure admin access.</p>
+    <p class="lbp-copy">&copy; {{ date('Y') }} Shahriar Aviation. Secure admin access.</p>
   </div>
 
   {{-- ============ Right: form ============ --}}
@@ -206,7 +206,7 @@
         </form>
       </div>
 
-      <p class="login-footnote">&copy; {{ date('Y') }} Shahriar Worldwide Venture · Secure admin access</p>
+      <p class="login-footnote">&copy; {{ date('Y') }} Shahriar Aviation · Secure admin access</p>
     </div>
   </div>
 
