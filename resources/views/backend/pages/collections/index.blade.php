@@ -1,8 +1,16 @@
 @extends('backend.master')
 
+@section('page-title', 'Passport Collections')
+@section('page-subtitle', 'Handover records for delivered passports')
+
 @section('content')
+{{-- ============================================================
+     ডিজাইন নোট (কলেকশন লিস্টে যা কাজ হয়েছে):
+     • নীল গ্র্যাডিয়েন্ট হেডার/লাইট থিম বাদ — নতুন ডার্ক থিম।
+     • ফিল্টার কার্ড: সার্চ, স্ট্যাটাস, কর্মী, এজেন্সি, তারিখ রেঞ্জ, সর্ট, পার-পেজ — সব আগের মতো।
+     • SweetAlert ডিলিট কনফার্মেশন ও Flatpickr আগের লজিকেই চলে।
+     ============================================================ --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.min.css">
 
 @php
   // Safe defaults pulled from the request if controller didn't pass them
@@ -22,7 +30,6 @@
     $employees = collect();
   }
   try {
-    // Adjust model name if yours is different (e.g., ProcessingAgency)
     $agencies = $agencies ?? \App\Models\Agency::orderBy('name')->get(['id','name']);
   } catch (\Throwable $e) {
     $agencies = collect();
@@ -30,7 +37,6 @@
 
   // Helper for latest processing on a passport (already eager-loaded)
   $getLatestProcessing = function($passport) {
-      // processings relation is loaded by controller ->with('passport.processings.agency')
       if (!$passport || !$passport->relationLoaded('processings')) return null;
       return $passport->processings->sortByDesc('id')->first();
   };
@@ -40,100 +46,37 @@
       $upper = strtoupper((string)$st);
       return match($upper) {
           'PENDING'   => 'bg-secondary',
-          'IN_PROGRESS','ONGOING','ON GOING' => 'bg-warning text-dark',
+          'IN_PROGRESS','ONGOING','ON GOING' => 'bg-warning',
           'DONE','APPROVED' => 'bg-success',
           'REJECTED'  => 'bg-danger',
-          default     => 'bg-dark'
+          default     => 'bg-light'
       };
   };
 @endphp
 
-<style>
-  :root{
-    --bg:#eef3fb;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --line:#dbe2ef;
-    --brand:#2563eb;
-    --brand2:#06b6d4;
-    --green:#22c55e;
-    --amber:#f59e0b;
-    --red:#ef4444;
-  }
-
-  body{ background:var(--bg); }
-  .container-fluid{ max-width:1180px; }
-
-  /* Header */
-  .page-head{
-    background:linear-gradient(110deg,var(--brand),var(--brand2));
-    color:#fff;border-radius:18px;padding:16px 22px;display:flex;
-    align-items:center;justify-content:space-between;gap:10px;
-    box-shadow:0 12px 24px rgba(37,99,235,.25);
-  }
-  .page-head h3{ margin:0; font-weight:900; }
-  .page-head .btn{
-    background:#fff;color:var(--brand);border:none;border-radius:12px;padding:8px 18px;font-weight:800;
-  }
-  .page-head .btn:hover{ background:#eaf2ff }
-
-  /* Filter card */
-  .filters{
-    background:#fff;border-radius:18px;box-shadow:0 10px 24px rgba(2,8,20,.08);
-    padding:18px 18px 14px;margin:18px 0;
-  }
-  .filters .form-label{ font-weight:700;font-size:13px;color:var(--ink); }
-  .filters .form-control,.filters .form-select{
-    border:1px solid var(--line);border-radius:12px;background:#fafcff;
-    transition:.15s ease;
-  }
-  .filters .form-control:focus,.filters .form-select:focus{
-    border-color:#93c5fd;box-shadow:inset 4px 0 0 0 var(--brand),0 0 0 3px rgba(147,197,253,.25);
-  }
-  .btn-apply{
-    background:linear-gradient(90deg,var(--brand),var(--brand2));border:none;border-radius:12px;
-    color:#fff;font-weight:900;
-  }
-  .btn-reset{
-    background:#f1f5f9;border:none;border-radius:12px;color:#111;font-weight:900;
-  }
-
-  /* Date range control */
-  .daterange .input-group-text{ background:#f8fafc;border:1px solid var(--line);border-right:none;border-radius:12px 0 0 12px; }
-  .daterange input{ border-left:none;border-radius:0 12px 12px 0; }
-
-  /* Table */
-  .table-wrap{ border-radius:18px;overflow:auto;border:1px solid var(--line); }
-  table.table{ background:#e9f3ff; }
-  thead th{
-    position:sticky;top:0;background:#1f2937!important;color:#fff!important;border:none;z-index:2;
-  }
-  tbody tr{ background:#fff; transition:.18s ease; }
-  tbody tr:nth-child(odd){ background:#f9fbff; }
-  tbody tr:hover{ background:#eaf1ff; }
-  th,td{ white-space:nowrap;vertical-align:middle;padding:10px 12px; }
-  .badge{ font-size:12px;padding:6px 10px;border-radius:10px; }
-  .actions .btn{ padding:4px 10px;font-size:12px;border-radius:10px; }
-
-  /* SweetAlert */
-  .swal2-popup{ border-radius:16px!important; }
-</style>
-
-<div class="container-fluid py-3">
+<div class="container-fluid px-0">
 
   {{-- Header --}}
-  <div class="page-head">
-    <h3>Passport Collections</h3>
-    <a href="{{ route('collections.create') }}" class="btn"><i class="fas fa-plus"></i> New Collection</a>
+  <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+      <h3>Passport Collections</h3>
+      <p class="ph-desc">Records of passports handed over to their owners.</p>
+    </div>
+    @if (can_do('collections.create'))
+      <a href="{{ route('collections.create') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> New Collection
+      </a>
+    @endif
   </div>
 
   {{-- Flash --}}
   @if(session('success'))
-    <div class="alert alert-success mt-3">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
   @endif
 
   {{-- Filters --}}
-  <form method="GET" action="{{ route('collections.index') }}" class="filters" id="filtersForm">
+  <form method="GET" action="{{ route('collections.index') }}" class="card p-3 p-md-4 mb-3" id="filtersForm">
+    <div class="section-title mb-3"><i class="fas fa-sliders"></i> Filter</div>
     <div class="row g-3 align-items-end">
       <div class="col-md-3">
         <label class="form-label">Search</label>
@@ -172,7 +115,7 @@
 
       <div class="col-md-3">
         <label class="form-label">Collected At (Range)</label>
-        <div class="input-group daterange">
+        <div class="input-group">
           <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
           <input type="text" id="dateRange" class="form-control" placeholder="Select date range">
           <input type="hidden" name="date_from" id="date_from" value="{{ $dateFrom }}">
@@ -200,17 +143,17 @@
       </div>
 
       <div class="col-md-8 d-flex gap-2">
-        <button class="btn btn-apply" type="submit"><i class="fas fa-filter"></i> Apply</button>
-        <a href="{{ route('collections.index') }}" class="btn btn-reset">Reset</a>
+        <button class="btn btn-apply px-4" type="submit"><i class="fas fa-filter me-1"></i> Apply</button>
+        <a href="{{ route('collections.index') }}" class="btn btn-reset px-4"><i class="fas fa-rotate-left me-1"></i> Reset</a>
       </div>
     </div>
   </form>
 
   {{-- Table --}}
-  <div class="table-wrap">
+  <div class="card p-2 p-md-3">
     <div class="table-responsive">
       <table class="table table-bordered align-middle text-center">
-        <thead class="table-dark">
+        <thead>
           <tr>
             <th>SL</th>
             <th>Passport Holder</th>
@@ -220,7 +163,7 @@
             <th>Status</th>
             <th>Received By</th>
             <th>Collected At</th>
-            <th style="min-width:180px;">Actions</th>
+            <th style="min-width:190px;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -249,33 +192,50 @@
                   <span class="badge bg-secondary">—</span>
                 @endif
               </td>
-              <td class="actions">
-                <a href="{{ route('collections.show', $c->id) }}" class="btn btn-sm btn-info">
-                  <i class="fas fa-eye"></i> View
-                </a>
-                <button type="button" class="btn btn-sm btn-danger btn-del" data-id="{{ $c->id }}">
-                  <i class="fas fa-trash-alt"></i> Delete
-                </button>
-                <form id="del-{{ $c->id }}" action="{{ route('collections.destroy', $c->id) }}" method="POST" class="d-none">
-                  @csrf @method('DELETE')
-                </form>
+              <td>
+                <div class="d-flex justify-content-center gap-1">
+                  <a href="{{ route('collections.show', $c->id) }}" class="btn btn-sm btn-info">
+                    <i class="fas fa-eye"></i> View
+                  </a>
+                  @if (can_do('collections.delete'))
+                    <button type="button" class="btn btn-sm btn-danger btn-del" data-id="{{ $c->id }}">
+                      <i class="fas fa-trash-can"></i> Delete
+                    </button>
+                    <form id="del-{{ $c->id }}" action="{{ route('collections.destroy', $c->id) }}" method="POST" class="d-none">
+                      @csrf @method('DELETE')
+                    </form>
+                  @endif
+                </div>
               </td>
             </tr>
           @empty
-            <tr><td colspan="9" class="text-muted">No collections found.</td></tr>
+            <tr>
+              <td colspan="9">
+                <div class="empty-state">
+                  <div class="es-icon"><i class="fas fa-box-open"></i></div>
+                  <div class="fw-semibold mb-1" style="color:var(--text-soft)">No collections found</div>
+                  <div>Try adjusting the filters or record a new collection.</div>
+                </div>
+              </td>
+            </tr>
           @endforelse
         </tbody>
       </table>
     </div>
-  </div>
 
-  <div class="mt-3">
-    {{ $collections->appends(request()->query())->links() }}
+    <div class="mt-3 px-1 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="text-muted small">
+        Showing
+        @if($collections->total()) {{ $collections->firstItem() }}–{{ $collections->lastItem() }} @else 0 @endif
+        of {{ $collections->total() }} results
+      </div>
+      <div>{{ $collections->appends(request()->query())->links() }}</div>
+    </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@push('scripts')
 <script>
   // Date range -> sets hidden fields
   (function(){
@@ -306,8 +266,8 @@
         text: 'This will remove the record and revert the passport status.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#2563eb',
-        cancelButtonColor: '#6b7280',
+        confirmButtonColor: '#4e86e8',
+        cancelButtonColor: '#3a465e',
         confirmButtonText: 'Yes, delete it',
         cancelButtonText: 'Cancel'
       }).then(res=>{
@@ -318,4 +278,5 @@
     });
   });
 </script>
+@endpush
 @endsection

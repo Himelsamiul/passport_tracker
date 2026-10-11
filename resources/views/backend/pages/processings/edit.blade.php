@@ -1,12 +1,28 @@
 @extends('backend.master')
 
-@section('content')
-<div class="container-fluid py-4">
-  <h3 class="mb-3">Edit Processing</h3>
+@section('page-title', 'Edit Processing')
+@section('page-subtitle', 'Update a processing entry')
 
-  <div class="mb-3">
-    <a href="{{ route('processings.index') }}" class="btn btn-secondary btn-sm">← Back</a>
-    <a href="{{ route('processings.show', $processing->id) }}" class="btn btn-info btn-sm">View</a>
+@section('content')
+{{-- ============================================================
+     ডিজাইন নোট (প্রসেসিং এডিট পেজে যা কাজ হয়েছে):
+     • নতুন ডার্ক থিমে ফর্ম কার্ড; উপরে Back/View বাটন ও পাসপোর্ট রেফারেন্স।
+     • সব ফিল্ড ও লজিক (employee/agency/status/notes) অপরিবর্তিত।
+     ============================================================ --}}
+<div class="container-fluid px-0" style="max-width:1000px">
+
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+      <h3 class="mb-0">Edit Processing</h3>
+      <p class="ph-desc" style="color:var(--muted);font-size:.84rem;margin:2px 0 0">
+        Processing for <span class="fw-semibold" style="color:var(--text-soft)">{{ $processing->passport->passport_number ?? '—' }}</span>
+        — {{ $processing->passport->applicant_name ?? '—' }}
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ route('processings.show', $processing->id) }}" class="btn btn-info btn-sm"><i class="fas fa-eye me-1"></i> View</a>
+      <a href="{{ route('processings.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i> Back</a>
+    </div>
   </div>
 
   @if ($errors->any())
@@ -19,16 +35,13 @@
     </div>
   @endif
 
-  <div class="card mb-3">
-    <div class="card-header fw-bold">
-      Processing for: {{ $processing->passport->passport_number ?? '—' }} — {{ $processing->passport->applicant_name ?? '—' }}
-    </div>
-    <div class="card-body">
+  <div class="card">
+    <div class="card-body p-3 p-md-4">
       <form method="POST" action="{{ route('processings.update', $processing->id) }}">
         @csrf @method('PUT')
         <div class="row g-3">
           <div class="col-md-4">
-            <label class="form-label">Employee (Picked Up By)</label>
+            <label class="form-label">Employee (Picked Up By) <span class="text-danger">*</span></label>
             <select name="employee_id" class="form-select" required>
               @foreach($employees as $e)
                 <option value="{{ $e->id }}" @selected(old('employee_id', $processing->employee_id) == $e->id)>{{ $e->name }}</option>
@@ -47,7 +60,7 @@
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">Status</label>
+            <label class="form-label">Status <span class="text-danger">*</span></label>
             <select name="status" class="form-select" required>
               @foreach(['PENDING','IN_PROGRESS','DONE','REJECTED'] as $opt)
                 <option value="{{ $opt }}" @selected(old('status', $processing->status) === $opt)>{{ $opt }}</option>
@@ -61,8 +74,9 @@
           </div>
         </div>
 
-        <div class="text-end mt-3">
-          <button class="btn btn-primary" type="submit">Update</button>
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-primary px-4" type="submit"><i class="fas fa-arrows-rotate me-1"></i> Update</button>
+          <a href="{{ route('processings.index') }}" class="btn btn-secondary">Cancel</a>
         </div>
       </form>
     </div>

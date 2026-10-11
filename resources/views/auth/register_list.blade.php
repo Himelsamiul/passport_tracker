@@ -1,57 +1,65 @@
 @extends('backend.master')
 
+@section('page-title', 'Registrations')
+@section('page-subtitle', 'Public registration submissions')
+
 @section('content')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.min.css">
+{{-- ============================================================
+     ডিজাইন নোট (রেজিস্ট্রেশন লিস্টে যা কাজ হয়েছে):
+     • নীল গ্র্যাডিয়েন্ট হেডার বাদ — নতুন ডার্ক থিমে পেজ হেডার + "+ New" বাটন।
+     • ফিল্টার (সার্চ/স্ট্যাটাস), অ্যাক্টিভ-টগল ও SweetAlert ডিলিট — সব লজিক আগের মতো।
+     ============================================================ --}}
+<div class="container-fluid px-0">
 
-<style>
-  .page-head{background:linear-gradient(120deg,#2563eb,#0ea5e9);color:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 14px 28px rgba(2,8,20,.12)}
-  .table thead th{background:#0f172a;color:#fff;position:sticky;top:0;z-index:3}
-  .badge{padding:.45rem .65rem;border-radius:.6rem;font-weight:700}
-</style>
-
-<div class="container-fluid py-4">
-  <div class="page-head d-flex align-items-center justify-content-between">
-    <h5 class="m-0 fw-bold">Registered Users</h5>
-    <a href="{{ route('register.form') }}" class="btn btn-light btn-sm">+ New</a>
+  <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+      <h3>Registered Users</h3>
+      <p class="ph-desc">People who registered through the public form.</p>
+    </div>
+    @if (can_do('registrations.create'))
+      <a href="{{ route('register.form') }}" class="btn btn-primary btn-sm">
+        <i class="fas fa-plus me-1"></i> New
+      </a>
+    @endif
   </div>
 
   @if(session('success'))
-    <div class="alert alert-success mt-3">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
   @endif
 
   {{-- Filters --}}
-  <form method="GET" class="card mt-3">
-    <div class="card-body row g-2 align-items-end">
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Search</label>
+  <form method="GET" class="card p-3 p-md-4 mb-3">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Search</label>
         <input type="text" class="form-control" name="q" value="{{ $q ?? '' }}" placeholder="Name or Email">
       </div>
       <div class="col-md-3">
-        <label class="form-label fw-semibold">Status</label>
+        <label class="form-label">Status</label>
         <select name="status" class="form-select">
           <option value="" {{ ($status??'')===''?'selected':'' }}>All</option>
           <option value="active" {{ ($status??'')==='active'?'selected':'' }}>Active</option>
           <option value="inactive" {{ ($status??'')==='inactive'?'selected':'' }}>Inactive</option>
         </select>
       </div>
-      <div class="col-md-3">
-        <button class="btn btn-primary" type="submit">Apply</button>
-        <a class="btn btn-secondary" href="{{ route('register.list') }}">Reset</a>
+      <div class="col-md-4">
+        <button class="btn btn-apply px-4" type="submit"><i class="fas fa-filter me-1"></i> Apply</button>
+        <a class="btn btn-reset px-4" href="{{ route('register.list') }}"><i class="fas fa-rotate-left me-1"></i> Reset</a>
       </div>
     </div>
   </form>
 
-  <div class="card mt-3">
+  <div class="card p-2 p-md-3">
     <div class="table-responsive">
       <table class="table table-bordered align-middle">
         <thead>
           <tr>
-            <th style="width:60px">#</th>
+            <th style="width:56px">#</th>
             <th>Name</th>
             <th>Email</th>
-            <th style="width:140px">Status</th>
-            <th style="width:200px">Created</th>
-            <th style="width:220px" class="text-center">Actions</th>
+            <th style="width:130px">Status</th>
+            <th style="width:190px">Created</th>
+            <th style="width:240px" class="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -67,35 +75,54 @@
               </td>
               <td>{{ $u->created_at?->format('d M Y, h:i A') }}</td>
               <td class="text-center">
-                {{-- Toggle status --}}
-                <form action="{{ route('register.status', $u->id) }}" method="POST" class="d-inline-block">
-                  @csrf @method('PATCH')
-                  <button type="submit" class="btn btn-sm {{ $u->status==='active'?'btn-warning':'btn-success' }}">
-                    {{ $u->status==='active' ? 'Deactivate' : 'Activate' }}
-                  </button>
-                </form>
+                <div class="d-flex justify-content-center gap-1">
+                  @if (can_do('registrations.edit'))
+                    {{-- Toggle status --}}
+                    <form action="{{ route('register.status', $u->id) }}" method="POST">
+                      @csrf @method('PATCH')
+                      <button type="submit" class="btn btn-sm {{ $u->status==='active'?'btn-warning':'btn-success' }}">
+                        {{ $u->status==='active' ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    </form>
+                  @endif
 
-                {{-- Delete with confirm --}}
-                <form action="{{ route('register.destroy', $u->id) }}" method="POST" class="d-inline-block delete-form">
-                  @csrf @method('DELETE')
-                  <button type="button" class="btn btn-sm btn-danger btn-delete">Delete</button>
-                </form>
+                  @if (can_do('registrations.delete'))
+                    {{-- Delete with confirm --}}
+                    <form action="{{ route('register.destroy', $u->id) }}" method="POST" class="delete-form">
+                      @csrf @method('DELETE')
+                      <button type="button" class="btn btn-sm btn-danger btn-delete"><i class="fas fa-trash-can"></i> Delete</button>
+                    </form>
+                  @endif
+                </div>
               </td>
             </tr>
           @empty
-            <tr><td colspan="6" class="text-muted text-center">No registered users found.</td></tr>
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="es-icon"><i class="fas fa-user-plus"></i></div>
+                  <div class="fw-semibold mb-1" style="color:var(--text-soft)">No registered users found</div>
+                  <div>Registrations from the public form will appear here.</div>
+                </div>
+              </td>
+            </tr>
           @endforelse
         </tbody>
       </table>
     </div>
 
-    <div class="p-3">
+    <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="text-muted small">
+        Showing
+        @if($registrations->total()) {{ $registrations->firstItem() }}–{{ $registrations->lastItem() }} @else 0 @endif
+        of {{ $registrations->total() }} results
+      </div>
       {{ $registrations->links() }}
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@push('scripts')
 <script>
 document.querySelectorAll('.btn-delete').forEach(btn=>{
   btn.addEventListener('click', (e)=>{
@@ -105,6 +132,8 @@ document.querySelectorAll('.btn-delete').forEach(btn=>{
       text: 'This action cannot be undone.',
       icon: 'warning',
       showCancelButton: true,
+      confirmButtonColor: '#4e86e8',
+      cancelButtonColor: '#3a465e',
       confirmButtonText: 'Yes, delete',
       cancelButtonText: 'Cancel'
     }).then(res=>{
@@ -113,4 +142,5 @@ document.querySelectorAll('.btn-delete').forEach(btn=>{
   });
 });
 </script>
+@endpush
 @endsection

@@ -1,108 +1,46 @@
 @extends('backend.master')
 
+@section('page-title', 'Processing')
+@section('page-subtitle', 'Track each passport through its stages')
+
 @section('content')
+{{-- ============================================================
+     ডিজাইন নোট (প্রসেসিং লিস্টে যা কাজ হয়েছে):
+     • নীল গ্র্যাডিয়েন্ট হেডার ও লাইট থিম বাদ — নতুন ডার্ক থিম।
+     • উপরে সামারি চিপ (Total / Pending / In-Progress / Done / Rejected) নতুন সফট স্টাইলে।
+     • ফিল্টার কার্ড: স্ট্যাটাস, কর্মী, এজেন্সি, কলেকশন স্ট্যাটাস, সার্চ, তারিখ রেঞ্জ (Flatpickr)।
+     • SweetAlert2-এর ডিলিট/এডিট কনফার্মেশন আগের মতোই — শুধু রং থিমের সাথে মেলানো।
+     • কলেক্টেড রেকর্ড লক থাকে — লজিক অপরিবর্তিত।
+     ============================================================ --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.min.css">
 
-<style>
-  :root{
-    --bg:#f3f7ff;
-    --card:#ffffff;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --line:#e2e8f0;
-    --blue:#2563eb;
-    --blue2:#60a5fa;
-    --teal:#0ea5e9;
-    --green:#22c55e;
-    --danger:#ef4444;
-  }
+<div class="container-fluid px-0">
 
-  body{ background:var(--bg); }
-
-  .page-head{
-    background:linear-gradient(120deg,var(--blue),var(--teal));
-    color:#fff; border-radius:16px; padding:18px 24px;
-    box-shadow:0 12px 28px rgba(37,99,235,.25);
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
-  }
-  .page-head h3{ font-weight:800; margin:0; }
-  .page-head a.btn{ background:#fff; color:var(--blue); font-weight:700; border-radius:12px; }
-
-  .summary .pill{
-    display:inline-flex; align-items:center; gap:6px;
-    padding:8px 16px; border-radius:25px;
-    font-size:13px; font-weight:700; color:#fff;
-    box-shadow:0 4px 10px rgba(0,0,0,.1);
-    transition:transform .2s, box-shadow .2s;
-  }
-  .summary .pill:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,.15); }
-
-  .summary .total{ background:#6366f1; }
-  .summary .pending{ background:#facc15; color:#111; }
-  .summary .inprogress{ background:#0ea5e9; }
-  .summary .done{ background:#16a34a; }
-  .summary .rejected{ background:#ef4444; }
-
-  .filter-card{
-    background:var(--card); border:1px solid var(--line);
-    border-radius:16px; padding:20px; margin-top:16px;
-    box-shadow:0 10px 24px rgba(0,0,0,.06); animation:fadeIn .6s ease;
-  }
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)} }
-  .form-label{ font-weight:700; color:var(--ink); margin-bottom:6px; }
-  .form-control, .form-select{
-    border:1px solid var(--line); border-radius:10px; background:#f9fbff; transition:all .25s;
-  }
-  .form-control:focus, .form-select:focus{
-    border-color:var(--blue2); box-shadow:0 0 0 3px rgba(96,165,250,.22); background:#fff;
-  }
-  .btn-apply{
-    background:linear-gradient(135deg,var(--blue),var(--blue2)); color:#fff; font-weight:800; border:none;
-    border-radius:10px; box-shadow:0 6px 18px rgba(37,99,235,.25);
-  }
-  .btn-reset{
-    background:linear-gradient(135deg,#e2e8f0,#f8fafc); color:#0f172a; font-weight:800; border:none;
-    border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,.1);
-  }
-
-  .table-container{ margin-top:20px; border-radius:16px; overflow:hidden; border:1px solid var(--line); }
-  .table{ font-size:13px; background:#e9f3ff; }
-  .table thead th{
-    background:linear-gradient(135deg,var(--blue),var(--blue2));
-    color:#fff; border:none; position:sticky; top:0; z-index:3;
-  }
-  .table td, .table th{ white-space:nowrap; vertical-align:middle; padding:8px 12px; }
-  .table tbody tr:hover{ background:#e7f1ff; transform:translateY(-1px); box-shadow:0 10px 18px rgba(2,8,20,.06); }
-
-  .badge{ font-size:12px; padding:5px 10px; border-radius:10px; }
-  .badge.bg-success{ background:var(--green) !important; }
-  .badge.bg-warning{ background:#facc15 !important; color:#111 !important; }
-  .badge.bg-danger{ background:var(--danger) !important; }
-  .badge.bg-secondary{ background:#94a3b8 !important; }
-  .badge.bg-dark{ background:#111827 !important; }
-
-  @media (max-width:768px){
-    .filter-card .col-md-2, .filter-card .col-md-3 { flex:0 0 48%; max-width:48%; }
-  }
-</style>
-
-<div class="container-fluid py-3 py-md-4">
-  <div class="page-head">
-    <h3>Processing List</h3>
-    <a href="{{ route('processings.create') }}" class="btn"><i class="fas fa-plus"></i> New Processing</a>
+  {{-- Page header --}}
+  <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+      <h3>Processing List</h3>
+      <p class="ph-desc">Every passport currently moving through its processing stages.</p>
+    </div>
+    @if (can_do('processings.create'))
+      <a href="{{ route('processings.create') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> New Processing
+      </a>
+    @endif
   </div>
 
-  <div class="summary mt-3 mb-2 d-flex flex-wrap gap-2">
-    <span class="pill total">Total: <strong>{{ $totals['total'] }}</strong></span>
-    <span class="pill pending">Pending: <strong>{{ $totals['pending'] }}</strong></span>
-    <span class="pill inprogress">In-Progress: <strong>{{ $totals['in_progress'] }}</strong></span>
-    <span class="pill done">Done: <strong>{{ $totals['done'] }}</strong></span>
-    <span class="pill rejected">Rejected: <strong>{{ $totals['rejected'] }}</strong></span>
+  {{-- Summary chips --}}
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <span class="badge bg-primary" style="font-size:.78rem;padding:.5em .9em">Total: {{ $totals['total'] }}</span>
+    <span class="badge bg-warning" style="font-size:.78rem;padding:.5em .9em">Pending: {{ $totals['pending'] }}</span>
+    <span class="badge bg-info"    style="font-size:.78rem;padding:.5em .9em">In-Progress: {{ $totals['in_progress'] }}</span>
+    <span class="badge bg-success" style="font-size:.78rem;padding:.5em .9em">Done: {{ $totals['done'] }}</span>
+    <span class="badge bg-danger"  style="font-size:.78rem;padding:.5em .9em">Rejected: {{ $totals['rejected'] }}</span>
   </div>
 
   {{-- Filters --}}
-  <div class="filter-card">
+  <div class="card p-3 p-md-4 mb-3">
+    <div class="section-title mb-3"><i class="fas fa-sliders"></i> Filter</div>
     <form method="GET" id="filterForm" class="row g-3 align-items-end">
       <div class="col-md-2">
         <label class="form-label">Status</label>
@@ -150,14 +88,14 @@
         <input type="hidden" name="date_to" id="date_to" value="{{ $dateTo ?? '' }}">
       </div>
       <div class="col-12 d-flex gap-2 mt-1">
-        <button class="btn btn-apply px-4" type="submit"><i class="fas fa-filter"></i> Apply</button>
-        <a href="{{ route('processings.index') }}" class="btn btn-reset px-4"><i class="fas fa-undo"></i> Reset</a>
+        <button class="btn btn-apply px-4" type="submit"><i class="fas fa-filter me-1"></i> Apply</button>
+        <a href="{{ route('processings.index') }}" class="btn btn-reset px-4"><i class="fas fa-rotate-left me-1"></i> Reset</a>
       </div>
     </form>
   </div>
 
   {{-- Table --}}
-  <div class="table-container mt-3">
+  <div class="card p-2 p-md-3">
     <div class="table-responsive">
       <table class="table table-bordered text-center align-middle">
         <thead>
@@ -168,7 +106,7 @@
             <th>Employee</th>
             <th>Agency</th>
             <th>Processing Status</th>
-            <th>Collection Status</th>
+            <th>Collection</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
@@ -178,14 +116,14 @@
             @php
               $collectedRow = \App\Models\PassportCollection::where('passport_id',$proc->passport_id)->exists();
               $procBadge = match($proc->status){
-                'DONE'=>'bg-success','IN_PROGRESS'=>'bg-warning text-dark',
+                'DONE'=>'bg-success','IN_PROGRESS'=>'bg-warning',
                 'PENDING'=>'bg-secondary','REJECTED'=>'bg-danger',default=>'bg-secondary'};
-              $collectBadge = $collectedRow ? 'bg-success' : 'bg-dark';
+              $collectBadge = $collectedRow ? 'bg-success' : 'bg-light';
               $collectText  = $collectedRow ? 'Collected' : 'Not Collected';
             @endphp
             <tr>
               <td>{{ ($processings->currentPage()-1)*$processings->perPage() + $i + 1 }}</td>
-              <td>{{ $proc->passport->passport_number ?? '—' }}</td>
+              <td class="fw-semibold">{{ $proc->passport->passport_number ?? '—' }}</td>
               <td class="fw-semibold text-start">{{ $proc->passport->applicant_name ?? '—' }}</td>
               <td>{{ $proc->employee->name ?? '—' }}</td>
               <td>{{ $proc->agency->name ?? 'Unassigned' }}</td>
@@ -193,31 +131,48 @@
               <td><span class="badge {{ $collectBadge }}">{{ $collectText }}</span></td>
               <td>{{ $proc->created_at->format('d M Y, h:i A') }}</td>
               <td>
-                {{-- 🔒 If collected, disable Edit/Delete --}}
-                @if($collectedRow)
-                  <button class="btn btn-sm btn-secondary" disabled><i class="fas fa-lock"></i></button>
+                {{-- If collected or no permission, disable Edit/Delete --}}
+                @if($collectedRow || !can_do('processings.edit'))
+                  <button class="btn btn-sm btn-secondary" data-bs-toggle="tooltip" title="{{ $collectedRow ? 'Collected passports are locked.' : 'You do not have edit permission.' }}"><i class="fas fa-lock"></i></button>
                 @else
-                  <a href="{{ route('processings.edit',$proc->id) }}" class="btn btn-sm btn-warning btn-edit"><i class="fas fa-edit"></i></a>
-                  <form action="{{ route('processings.destroy',$proc->id) }}" method="POST" class="d-inline delete-form">
-                    @csrf @method('DELETE')
-                    <button type="button" class="btn btn-sm btn-danger btn-delete"><i class="fas fa-trash"></i></button>
-                  </form>
+                  <a href="{{ route('processings.edit',$proc->id) }}" class="btn btn-sm btn-warning btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
+                  @if (can_do('processings.delete'))
+                    <form action="{{ route('processings.destroy',$proc->id) }}" method="POST" class="d-inline delete-form">
+                      @csrf @method('DELETE')
+                      <button type="button" class="btn btn-sm btn-danger btn-delete" title="Delete"><i class="fas fa-trash-can"></i></button>
+                    </form>
+                  @endif
                 @endif
               </td>
             </tr>
           @empty
-            <tr><td colspan="9" class="text-muted">No records found.</td></tr>
+            <tr>
+              <td colspan="9">
+                <div class="empty-state">
+                  <div class="es-icon"><i class="fas fa-gears"></i></div>
+                  <div class="fw-semibold mb-1" style="color:var(--text-soft)">No records found</div>
+                  <div>Try adjusting the filters or create a new processing entry.</div>
+                </div>
+              </td>
+            </tr>
           @endforelse
         </tbody>
       </table>
     </div>
-  </div>
 
-  <div class="mt-3">{{ $processings->links() }}</div>
+    <div class="mt-3 px-1 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="text-muted small">
+        Showing
+        @if($processings->total()) {{ $processings->firstItem() }}–{{ $processings->lastItem() }} @else 0 @endif
+        of {{ $processings->total() }} results
+      </div>
+      <div>{{ $processings->links() }}</div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
   // Date range picker
@@ -243,8 +198,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
         text: 'This record will be permanently deleted.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#2563eb',
-        cancelButtonColor: '#6b7280',
+        confirmButtonColor: '#4e86e8',
+        cancelButtonColor: '#3a465e',
         confirmButtonText: 'Yes, delete it!',
         cancelButtonText: 'Cancel'
       }).then((res)=>{ if(res.isConfirmed){ form.submit(); } });
@@ -261,8 +216,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
         text: 'Do you really want to edit this record?',
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#0ea5e9',
-        cancelButtonColor: '#6b7280',
+        confirmButtonColor: '#4e86e8',
+        cancelButtonColor: '#3a465e',
         confirmButtonText: 'Yes, edit it!',
         cancelButtonText: 'Cancel'
       }).then((res)=>{ if(res.isConfirmed){ window.location.href = url; } });
@@ -270,4 +225,5 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 });
 </script>
+@endpush
 @endsection

@@ -13,5 +13,8 @@ class DatabaseSeeder extends Seeder
     {
         // Call your custom seeder file (UserSeeder)
         $this->call(UserSeeder::class);
+
+        // Demo dashboard content — only seeds an empty database, safe in production.
+        $this->call(DemoContentSeeder::class);
     }
 }

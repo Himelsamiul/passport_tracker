@@ -1,132 +1,192 @@
-<header class="header">
-  <nav class="navbar navbar-expand-lg py-2 header-nav">
-    <div class="container-fluid nav-grid px-3">
+{{-- ============================================================
+     ডিজাইন নোট (হেডারে যা কাজ হয়েছে):
+     • পরিষ্কার ডার্ক স্টিকি হেডার — বামে হ্যামবার্গার + পেজ টাইটেল/সাবটাইটেল।
+     • ডানে: লাইভ ঘড়ির চিপ, থিম টগল (🌙/☀️ — ডার্ক ডিফল্ট, localStorage-এ মনে থাকে),
+       নোটিফিকেশন বেল (সর্বশেষ প্রসেসিং/কলেকশন অ্যাক্টিভিটি; ২৪ ঘণ্টার মধ্যে নতুন
+       হলে লাল ব্যাজ — ড্রপডাউন খুললে "seen" হয়ে ব্যাজ চলে যায়), ইউজার ড্রপডাউন।
+     • পেজ টাইটেল @section('page-title') দিয়ে ওভাররাইড করা যায়, নাহলে রুট অনুযায়ী অটো।
+     ============================================================ --}}
+@php
+$user = session('user') ?? Auth::user();
 
-      {{-- LEFT: Clock --}}
-      <div class="nav-left d-flex align-items-center">
-        <div id="clock" class="text-gold fw-semibold fs-5"></div>
-      </div>
+// Per-page title/subtitle come from @section('page-title'/'page-subtitle');
+// fall back to sensible route-based defaults.
+$routeNames = [
+    'dashboard'          => ['Dashboard', 'Platform overview at a glance'],
+    'agents.*'           => ['Agents', 'People who submit passports to the desk'],
+    'passports.*'        => ['Passports', 'Registry of every application received'],
+    'employees.*'        => ['Employees', 'Internal staff handling passport files'],
+    'categories.*'       => ['Working Categories', 'Service categories used for agencies'],
+    'agencies.*'         => ['Agencies', 'Partner agencies processing abroad'],
+    'officers.*'         => ['Passport Officers', 'Officers responsible for processing'],
+    'processings.*'      => ['Processing', 'Track each passport through its stages'],
+    'register.*'         => ['Registrations', 'Public registration submissions'],
+    'collections.*'      => ['Passport Collections', 'Handover records for delivered passports'],
+    'reports.*'          => ['Reports', 'Operational and lifecycle reporting'],
+];
+$title = null; $sub = null;
+foreach ($routeNames as $pattern => $t) {
+    if (request()->routeIs($pattern)) { $title = $t[0]; $sub = $t[1]; break; }
+}
+$title = trim($__env->yieldContent('page-title')) ?: $title;
+$sub   = trim($__env->yieldContent('page-subtitle')) ?: $sub;
+$initial = mb_strtoupper(mb_substr($user->name ?? 'A', 0, 1));
 
-      {{-- CENTER: Brand --}}
-      <a class="navbar-brand nav-center d-flex align-items-center gap-2 fw-bold text-uppercase text-gold"
-         href="{{ url('/') }}">
-        <img src="{{ asset('logo.jpg') }}" alt="Logo"
-             class="rounded-circle border border-2 border-light" width="42" height="42">
-        <span class="brand-title">Passport Management System</span>
-      </a>
+// ---- Notifications: latest processing + collection activity ----
+$notifications = collect();
+$notifCount = 0;
+try {
+    $procs = \App\Models\PassportProcessing::with('passport')->latest('id')->limit(6)->get()
+        ->map(fn ($p) => [
+            'icon'  => 'fa-gears',
+            'tone'  => '',
+            'title' => 'Processing · ' . ($p->passport->passport_number ?? '—') . ' — ' . ($p->status ?? ''),
+            'time'  => optional($p->created_at)->diffForHumans(),
+            'at'    => optional($p->created_at)?->getTimestamp() ?? 0,
+            'url'   => route('processings.index'),
+        ]);
 
-      {{-- RIGHT: User --}}
-      <div class="nav-right d-flex align-items-center">
-        <ul class="navbar-nav align-items-center">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle user-toggle d-flex align-items-center gap-2"
-               href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="icon-circle"><i class="fas fa-user-tie"></i></div>
-              <span class="text-white fw-semibold text-capitalize user-label">
-                {{ session('user')->name ?? Auth::user()->name ?? 'Guest User' }}
-              </span>
-            </a>
+    $cols = \App\Models\PassportCollection::with('passport')->latest('id')->limit(6)->get()
+        ->map(fn ($c) => [
+            'icon'  => 'fa-box-open',
+            'tone'  => 'green',
+            'title' => 'Collection · ' . ($c->passport->passport_number ?? '—'),
+            'time'  => optional($c->collected_at ?? $c->created_at)->diffForHumans(),
+            'at'    => optional($c->collected_at ?? $c->created_at)?->getTimestamp() ?? 0,
+            'url'   => route('collections.index'),
+        ]);
 
-            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-2"
-                 aria-labelledby="userDropdown">
-              <div class="px-2 py-1 text-center">
-                <div class="fw-semibold text-capitalize text-dark">
-                  {{ session('user')->name ?? Auth::user()->name ?? 'Guest User' }}
-                </div>
-                <small class="text-secondary">Shahriar Worldwide Venture</small>
-              </div>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                <i class="fas fa-cog text-muted"></i><span>Settings</span>
-              </a>
-              <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                <i class="fas fa-list text-muted"></i><span>Activity Log</span>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item d-flex align-items-center gap-2 text-danger"
-                 href="{{ route('logout') }}"
-                 onclick="return confirm('Are you sure you want to logout?');">
-                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-              </a>
-            </div>
-          </li>
-        </ul>
-      </div>
+    $notifications = $procs->merge($cols)->sortByDesc('at')->take(7)->values();
+    // Badge = items created in the last 24 hours
+    $notifCount = $notifications->filter(fn ($n) => $n['at'] >= now()->subDay()->getTimestamp())->count();
+} catch (\Throwable $e) {
+    // Tables not ready yet — render an empty bell instead of breaking the header.
+}
 
+$newestAt = $notifications->max('at') ?? 0;
+@endphp
+
+<header class="app-header">
+    <button class="sidebar-burger" id="sidebarBurger" type="button" aria-label="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="header-titles">
+        <h1 class="page-title">{{ $title ?? 'Dashboard' }}</h1>
+        @if ($sub)<p class="page-subtitle">{{ $sub }}</p>@endif
     </div>
-  </nav>
+
+    <div class="header-actions">
+        <span class="clock-chip"><i class="far fa-clock"></i><span id="headerClock">--:--:--</span></span>
+
+        {{-- Theme toggle (dark by default) --}}
+        <button class="header-icon-btn" id="themeToggle" type="button" aria-label="Toggle light/dark mode"
+                title="Toggle light / dark mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+
+        {{-- Notification bell --}}
+        <div class="dropdown">
+            <button class="header-icon-btn" id="notifBtn" type="button"
+                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+                    aria-label="Notifications" data-newest="{{ $newestAt }}">
+                <i class="far fa-bell"></i>
+                <span class="notif-badge" id="notifBadge" {{ $notifCount === 0 ? 'hidden' : '' }}>{{ $notifCount > 9 ? '9+' : $notifCount }}</span>
+            </button>
+
+            <div class="dropdown-menu dropdown-menu-end notif-menu" aria-labelledby="notifBtn">
+                <div class="notif-head"><i class="far fa-bell" style="color:var(--accent-2)"></i> Notifications</div>
+                <div class="notif-list">
+                    @forelse ($notifications as $n)
+                        <a class="notif-item" href="{{ $n['url'] }}">
+                            <span class="ni-icon {{ $n['tone'] }}"><i class="fas {{ $n['icon'] }}"></i></span>
+                            <span>
+                                <span class="ni-title">{{ $n['title'] }}</span>
+                                <span class="ni-time">{{ $n['time'] }}</span>
+                            </span>
+                        </a>
+                    @empty
+                        <div class="notif-empty">No notifications yet.</div>
+                    @endforelse
+                </div>
+                <div class="notif-foot">
+                    <a href="{{ route('processings.index') }}">View all activity</a>
+                </div>
+            </div>
+        </div>
+
+        {{-- User menu --}}
+        <div class="dropdown">
+            <button class="header-user dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="avatar avatar-sm">{{ $initial }}</span>
+                <span class="hu-name">{{ $user->name ?? 'Guest User' }}</span>
+                <i class="fas fa-chevron-down" style="font-size:.62rem;color:var(--faint)"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li class="px-3 py-2">
+                    <div class="fw-semibold text-capitalize" style="font-size:.88rem">{{ $user->name ?? 'Guest User' }}</div>
+                    <div class="text-muted" style="font-size:.74rem">Shahriar Worldwide Venture</div>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{{ route('logout') }}"
+                       onclick="return confirm('Are you sure you want to logout?');">
+                        <i class="fas fa-arrow-right-from-bracket"></i><span>Sign out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </header>
 
-<style>
-  :root{ --deepblue:#02152E; --gold:#FFD700; }
-
-  /* Premium navy bar with subtle depth + gold hairline */
-  .header-nav{
-    background:linear-gradient(90deg,#04203f 0%, var(--deepblue) 45%, #04203f 100%);
-    border-bottom:1px solid rgba(255,215,0,.28);
-    box-shadow:0 10px 30px -14px rgba(2,21,46,.6);
-  }
-
-  /* Grid locks positions: [left clock] [center brand] [right user] */
-  .nav-grid{
-    display:grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items:center;
-    gap:12px;
-  }
-  .nav-left  { justify-self:start;
-             margin-left: 30px;    }
-  .nav-center{ justify-self:center; }
-  .nav-right { justify-self:end;
-              margin-right: 40px;  }
-
-  /* Gold gradient text */
-  .text-gold{
-    background:linear-gradient(90deg,#FFD700,#E6BE8A,#B8860B);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  }
-  .brand-title{ font-size:clamp(20px,2.3vw,26px); letter-spacing:.5px; }
-
-  /* Clock */
-  #clock{ letter-spacing:1px; text-shadow:0 0 8px rgba(255,215,0,.5); font-weight:700; }
-
-  /* User dropdown styles (same as before) */
-  .user-toggle{ color:#fff !important; border-radius:12px; padding:6px 10px; transition:background .25s, box-shadow .25s; }
-  .user-toggle:hover{ background:rgba(255,255,255,.07); box-shadow:0 2px 8px rgba(0,0,0,.2); }
-  .user-toggle::after{ display:none; }
-  .icon-circle{
-    background:linear-gradient(145deg,var(--gold),#e0b84e);
-    color:#0d1117; width:42px; height:42px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    font-size:20px; border:2px solid #fff; box-shadow:0 0 8px rgba(255,215,0,.4);
-    transition:transform .25s, box-shadow .25s;
-  }
-  .icon-circle:hover{ transform:scale(1.08); box-shadow:0 0 15px rgba(255,215,0,.6); }
-  .user-label{ font-size:15px; letter-spacing:.3px; }
-  .dropdown-menu{ min-width:240px; }
-  .dropdown-item{ border-radius:8px; padding:.5rem .7rem; font-weight:500; }
-  .dropdown-item:hover{ background:#f8f9fa; }
-  .dropdown-menu.show::before{
-    content:""; position:absolute; top:-8px; right:25px; width:14px; height:14px;
-    background:#fff; transform:rotate(45deg); box-shadow:-2px -2px 6px rgba(0,0,0,.05);
-  }
-
-  /* Mobile tweak: keep positions but allow wrapping cleanly */
-  @media (max-width: 576px){
-    .nav-grid{ grid-template-columns: 1fr auto auto; }
-    .nav-center{ justify-self:center; }
-    .brand-title{ font-size:18px; }
-    #clock{ font-size:14px; }
-  }
-</style>
-
 <script>
-  function updateClock(){
-    const now=new Date();
-    let h=now.getHours(), m=now.getMinutes(), s=now.getSeconds();
-    const ampm=h>=12?'PM':'AM'; h=h%12||12;
-    document.getElementById('clock').textContent =
-      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${ampm}`;
-  }
-  setInterval(updateClock,1000); updateClock();
+    (function () {
+        // ---- Live clock ----
+        function tick() {
+            var el = document.getElementById('headerClock');
+            if (!el) return;
+            var now = new Date();
+            var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            var ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+            el.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + ' ' + ampm;
+        }
+        setInterval(tick, 1000); tick();
+
+        // ---- Theme toggle (dark default) ----
+        var themeBtn = document.getElementById('themeToggle');
+        var themeIcon = document.getElementById('themeIcon');
+        if (themeBtn) {
+            // Sync icon with the mode applied before paint
+            if (document.body.classList.contains('light-mode')) themeIcon.className = 'fas fa-sun';
+
+            themeBtn.addEventListener('click', function () {
+                var light = !document.body.classList.contains('light-mode');
+                document.body.classList.toggle('light-mode', light);
+                themeIcon.className = light ? 'fas fa-sun' : 'fas fa-moon';
+                try { localStorage.setItem('pms-theme', light ? 'light' : 'dark'); } catch (e) {}
+                // Let charts on the page re-color themselves
+                window.dispatchEvent(new CustomEvent('pms-themechange', { detail: { light: light } }));
+            });
+        }
+
+        // ---- Notification badge: mark seen when the dropdown opens ----
+        var notifBtn = document.getElementById('notifBtn');
+        var notifBadge = document.getElementById('notifBadge');
+        if (notifBtn && notifBadge) {
+            notifBtn.addEventListener('show.bs.dropdown', function () {
+                try {
+                    var newest = parseInt(notifBtn.dataset.newest || '0', 10);
+                    localStorage.setItem('pms-notif-seen', String(newest));
+                } catch (e) {}
+                notifBadge.hidden = true;
+            });
+
+            // On load: hide badge if nothing newer than last seen
+            try {
+                var seen = parseInt(localStorage.getItem('pms-notif-seen') || '0', 10);
+                var newest = parseInt(notifBtn.dataset.newest || '0', 10);
+                if (newest > 0 && newest <= seen) notifBadge.hidden = true;
+            } catch (e) {}
+        }
+    })();
 </script>

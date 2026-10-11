@@ -1,11 +1,27 @@
 @extends('backend.master')
 
-@section('content')
-<div class="container-fluid py-4">
+@section('page-title', 'Collection Details')
+@section('page-subtitle', 'Full record of a passport handover')
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">Passport Collection Details</h3>
-    <a href="{{ route('collections.index') }}" class="btn btn-outline-secondary">Back to List</a>
+@section('content')
+{{-- ============================================================
+     ডিজাইন নোট (কলেকশন ডিটেইলস পেজে যা কাজ হয়েছে):
+     • নতুন ডার্ক থিমে ৩টি কার্ড: স্টেকহোল্ডার, কলেকশন তথ্য, পাসপোর্ট তথ্য।
+     • প্রতিটি তথ্য label→value রো স্টাইলে; তিন ধাপের কর্মী রো রঙিন ডট দিয়ে আলাদা করা।
+     • সব ডেটা ও লজিক আগের মতোই।
+     ============================================================ --}}
+<div class="container-fluid px-0">
+
+  <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+      <h3>Passport Collection Details</h3>
+      <p class="ph-desc">
+        {{ $collection->passport->passport_number ?? '—' }} — {{ $collection->passport->applicant_name ?? '—' }}
+      </p>
+    </div>
+    <a href="{{ route('collections.index') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="fas fa-arrow-left me-1"></i> Back to List
+    </a>
   </div>
 
   @if(session('success'))
@@ -14,50 +30,47 @@
 
   <div class="row g-3">
 
-    <!-- 🧾 Stakeholder Info -->
+    {{-- Stakeholder Info --}}
     <div class="col-lg-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-header bg-primary text-white fw-semibold">Stakeholder Information</div>
+      <div class="card h-100">
+        <div class="card-header"><i class="fas fa-users me-2" style="color:var(--accent-2)"></i>Stakeholder Information</div>
         <div class="card-body">
-          <div class="mb-2"><strong>Agent Name:</strong> {{ $collection->passport->agent->name ?? '-' }}</div>
-          <div class="mb-2"><strong>Passport Officer:</strong> {{ $collection->passport->passportOfficer->name ?? '-' }}</div>
-          
+          <div class="detail-row"><span class="d-label">Agent Name</span><span class="d-value">{{ $collection->passport->agent->name ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Passport Officer</span><span class="d-value">{{ $collection->passport->passportOfficer->name ?? '-' }}</span></div>
           <hr>
-          <div class="mb-2 text-success"><strong>Employee (Received from Agent):</strong> {{ $collection->passport->employee->name ?? '-' }}</div>
-          <div class="mb-2 text-warning"><strong>Employee (Gave to Process):</strong> {{ optional($collection->passport->processings->last()->employee)->name ?? '-' }}</div>
-          <div class="mb-2 text-danger"><strong>Employee (Collected from Agency):</strong> {{ $collection->employee->name ?? '-' }}</div>
+          <div class="detail-row"><span class="d-label" style="color:var(--green)">● Received from Agent</span><span class="d-value">{{ $collection->passport->employee->name ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label" style="color:var(--amber)">● Gave to Process</span><span class="d-value">{{ optional($collection->passport->processings->last()->employee)->name ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label" style="color:var(--red)">● Collected from Agency</span><span class="d-value">{{ $collection->employee->name ?? '-' }}</span></div>
         </div>
       </div>
     </div>
 
-    <!-- 📦 Collection Info -->
+    {{-- Collection Info --}}
     <div class="col-lg-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-header bg-success text-white fw-semibold">Collection Information</div>
+      <div class="card h-100">
+        <div class="card-header"><i class="fas fa-box-open me-2" style="color:var(--accent-2)"></i>Collection Information</div>
         <div class="card-body">
-          <div class="mb-2"><strong>Collected By:</strong> {{ $collection->employee->name ?? '-' }}</div>
-          <div class="mb-2"><strong>Collected At:</strong> {{ optional($collection->collected_at)->format('d M Y, h:i A') }}</div>
-          <div class="mb-2"><strong>Notes:</strong> {{ $collection->notes ?? '-' }}</div>
+          <div class="detail-row"><span class="d-label">Collected By</span><span class="d-value">{{ $collection->employee->name ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Collected At</span><span class="d-value">{{ optional($collection->collected_at)->format('d M Y, h:i A') }}</span></div>
+          <div class="detail-row"><span class="d-label">Notes</span><span class="d-value">{{ $collection->notes ?? '-' }}</span></div>
         </div>
       </div>
     </div>
 
-    <!-- 🛂 Passport Info -->
+    {{-- Passport Info --}}
     <div class="col-lg-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-header bg-dark text-white fw-semibold">Passport Information</div>
+      <div class="card h-100">
+        <div class="card-header"><i class="fas fa-passport me-2" style="color:var(--accent-2)"></i>Passport Information</div>
         <div class="card-body">
-          <div class="row g-2">
-            <div class="col-12"><strong>Holder Name:</strong> {{ $collection->passport->applicant_name ?? '-' }}</div>
-            <div class="col-12"><strong>Passport Number:</strong> {{ $collection->passport->passport_number ?? '-' }}</div>
-            <div class="col-12"><strong>Date of Birth:</strong> {{ optional($collection->passport->date_of_birth)->format('d M Y') ?? '-' }}</div>
-            <div class="col-12"><strong>Nationality:</strong> {{ $collection->passport->nationality ?? '-' }}</div>
-            <div class="col-12"><strong>Phone:</strong> {{ $collection->passport->phone ?? '-' }}</div>
-            <div class="col-12"><strong>Address:</strong> {{ $collection->passport->address ?? '-' }}</div>
-            <div class="col-12"><strong>Issue Date:</strong> {{ optional($collection->passport->issue_date)->format('d M Y') ?? '-' }}</div>
-            <div class="col-12"><strong>Expiry Date:</strong> {{ optional($collection->passport->expiry_date)->format('d M Y') ?? '-' }}</div>
-            <div class="col-12"><strong>NID Number:</strong> {{ $collection->passport->nid_number ?? '-' }}</div>
-          </div>
+          <div class="detail-row"><span class="d-label">Holder Name</span><span class="d-value">{{ $collection->passport->applicant_name ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Passport Number</span><span class="d-value">{{ $collection->passport->passport_number ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Date of Birth</span><span class="d-value">{{ optional($collection->passport->date_of_birth)->format('d M Y') ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Nationality</span><span class="d-value">{{ $collection->passport->nationality ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Phone</span><span class="d-value">{{ $collection->passport->phone ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Address</span><span class="d-value">{{ $collection->passport->address ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Issue Date</span><span class="d-value">{{ optional($collection->passport->issue_date)->format('d M Y') ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">Expiry Date</span><span class="d-value">{{ optional($collection->passport->expiry_date)->format('d M Y') ?? '-' }}</span></div>
+          <div class="detail-row"><span class="d-label">NID Number</span><span class="d-value">{{ $collection->passport->nid_number ?? '-' }}</span></div>
         </div>
       </div>
     </div>
@@ -65,16 +78,19 @@
   </div>
 </div>
 
-
 @push('styles')
 <style>
-  .card { border-radius: 0.6rem; }
-  .card-header { font-size: 15px; text-transform: uppercase; }
-  .card-body { font-size: 14px; line-height: 1.6; }
-  strong { color: #0d6efd; }
-  .text-success strong { color: #198754; }
-  .text-warning strong { color: #ffc107; }
-  .text-danger strong { color: #dc3545; }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--line-soft);
+  }
+  .detail-row:last-child { border-bottom: 0; }
+  .detail-row .d-label { color: var(--muted); font-size: .8rem; }
+  .detail-row .d-value { color: var(--text); font-size: .875rem; font-weight: 550; text-align: right; }
 </style>
 @endpush
 @endsection

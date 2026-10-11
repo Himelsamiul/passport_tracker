@@ -4,6 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
+// Global helpers (can_do() permission checks etc.)
+require __DIR__ . '/../app/Support/helpers.php';
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
@@ -20,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->alias([
             'auth.session' => \App\Http\Middleware\SessionAuth::class,
+            'perm'         => \App\Http\Middleware\CheckPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

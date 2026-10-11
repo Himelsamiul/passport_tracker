@@ -1,139 +1,222 @@
 <!doctype html>
+{{-- ============================================================
+     ডিজাইন নোট (লগইন পেজে যা কাজ হয়েছে):
+     • পুরনো গ্লাস-কার্ড + ব্যাকগ্রাউন্ড ইমেজ ডিজাইন পুরোপুরি বাদ।
+     • ডেমোর মতো স্প্লিট-স্ক্রিন: বামে ব্র্যান্ড প্যানেল (আইকন টাইল, হেডলাইন, ৪টি ফিচার, কপিরাইট)।
+     • ডানে সাইন-ইন কার্ড — "Admin access only" ব্যাজ, ইমেইল/পাসওয়ার্ড, চোখ বাটন, Forgot password।
+     • লোগো ইমেজ বাদ — ব্র্যান্ড আইকন টাইল (স্যুটকেস আইকন) ব্যবহার করা হয়েছে।
+     • Bootstrap CSS লোড করা হয়েছে যাতে ইউটিলিটি ক্লাস (w-100, d-flex ইত্যাদি) কাজ করে।
+     • ফর্মের অ্যাকশন/CSRF/session error আগের মতোই — লজিকে কোনো পরিবর্তন নেই।
+     ============================================================ --}}
 <html lang="en">
 <head>
-  <meta charset="utf-8"><title>Admin Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <title>Sign in · Passport MS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+  <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="{{ asset('css/theme.css') }}?v=2" rel="stylesheet">
 
   <style>
-    :root{
-      /* === Deep blue theme (change anytime) === */
-      --theme-color:#0a1b3d;
-      --theme-color-dark:#07142e;
-      --theme-focus: rgba(10,27,61,.35);
-      --input-text-color:#0a1b3d; /* 🟦 Typing text color */
-
-      --glass-bg: rgba(255,255,255,.10);
-      --glass-brd: rgba(255,255,255,.22);
-      --glass-shadow: rgba(0,0,0,.45);
-      --ink:#e8eefc; 
-      --ink-soft:#c9d7fb;
+    /* Login-scoped helpers (Bootstrap utilities + theme tokens) */
+    .login-icon-tile {
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 46px;
+      font-size: 1.05rem;
+      color: #fff;
+      background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.1));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
     }
-
-    body{
-      min-height:100vh;
-      background:url("{{ url('admin2.png') }}") center/cover no-repeat fixed;
-      display:flex; align-items:center; justify-content:center;
-      padding:20px; color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    .login-icon-tile.dark {
+      background: linear-gradient(135deg, var(--accent) 0%, #7c5ff0 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 10px 24px -10px rgba(78,134,232,.7);
     }
+    .lbp-name { font-size: 1.02rem; font-weight: 650; letter-spacing: -0.01em; color: #fff; }
+    .login-mobile-brand { display: flex; align-items: center; gap: 11px; margin-bottom: 22px; }
+    .login-mobile-brand .lmb-text { font-weight: 650; font-size: .95rem; color: var(--text); }
 
-    .glass-card{
-      width:100%; max-width:430px;
-      background:var(--glass-bg);
-      border:1px solid var(--glass-brd);
-      border-radius:18px;
-      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-      box-shadow:0 20px 60px var(--glass-shadow);
-      animation:fadeIn .9s ease-out both;
+    body.login-page .login-form-side .login-card { padding: 34px 32px 30px; }
+
+    /* Left brand panel — assembled from tokens */
+    .login-brand-panel {
+      position: relative;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 52px 56px;
+      color: #fff;
+      background:
+        radial-gradient(90% 70% at 110% -10%, rgba(78, 134, 232, 0.35) 0%, transparent 55%),
+        radial-gradient(70% 60% at -15% 110%, rgba(124, 95, 240, 0.28) 0%, transparent 55%),
+        linear-gradient(165deg, #123a72 0%, var(--accent-deep) 48%, #0a2647 100%);
     }
-    @keyframes fadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-
-    .card-header{
-      background:linear-gradient(135deg, var(--theme-color), var(--theme-color-dark));
-      color:#fff; text-align:center; font-weight:800; letter-spacing:.3px;
-      padding:18px; border-top-left-radius:18px; border-top-right-radius:18px;
+    @media (min-width: 992px) { .login-brand-panel { display: flex; } }
+    .lbp-glow { pointer-events:none; position:absolute; border-radius:50%; filter:blur(70px); }
+    .lbp-glow-1 { width:320px; height:320px; top:-110px; right:-90px; background:rgba(255,255,255,.09); }
+    .lbp-glow-2 { width:380px; height:380px; bottom:-150px; left:-110px; background:rgba(56,200,240,.14); }
+    .lbp-brand { position:relative; display:flex; align-items:center; gap:13px; }
+    .lbp-headline {
+      position: relative;
+      font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+      font-weight: 700;
+      line-height: 1.22;
+      letter-spacing: -0.025em;
+      max-width: 21em;
+      color: #fff;
     }
-    .card-body{ padding:22px; }
-
-    /* Transparent Inputs */
-    .form-floating>.form-control{
-      background:rgba(255,255,255,.05); /* ✨ transparent look */
-      border:1px solid rgba(255,255,255,.25);
-      color:var(--input-text-color); /* deep blue text */
-      font-weight:500;
+    .lbp-tagline {
+      position: relative;
+      margin: 14px 0 0;
+      max-width: 30em;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.62);
     }
-    .form-floating label{ color:var(--ink-soft); }
-    .form-control::placeholder{ color:#999; }
-    .form-control:focus{
-      border-color: var(--theme-color);
-      box-shadow: 0 0 0 .25rem var(--theme-focus);
-      background:rgba(255,255,255,.08); /* keep transparent on focus */
-      color:var(--input-text-color);
+    .login-features { position: relative; display: grid; gap: 18px; }
+    .login-feature { display: flex; gap: 13px; align-items: flex-start; }
+    .login-feature .lf-icon {
+      width: 38px; height: 38px;
+      flex: 0 0 38px;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+      font-size: 0.9rem;
+      color: #fff;
     }
-
-    /* Deep-blue button */
-    .btn-theme{
-      background:linear-gradient(135deg, var(--theme-color), var(--theme-color-dark));
-      border:none; color:#fff; font-weight:700;
-      box-shadow:0 10px 28px rgba(10,27,61,.45);
-      transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
-    }
-    .btn-theme:hover{ transform:translateY(-2px); filter:brightness(1.06); }
-
-    /* Rows */
-    .check-row{ display:flex; align-items:center; gap:10px; margin-bottom:.5rem; }
-    .form-check-input{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.35); }
-    .form-check-input:checked{ background-color:var(--theme-color); border-color:var(--theme-color); }
-    .form-check-label{ color:var(--ink-soft); }
-
-    .links-row{
-      display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;
-      font-size:.95rem;
-    }
-    .links-row a{ text-decoration:none; }
-    .links-row a:first-child{ color:rgba(8, 26, 112, 1); }
-    .links-row a:last-child{ color:rgba(158, 6, 6, 1); }
-
-    .tiny{font-size:12px; text-align:center; color:#d5defa; opacity:.85; padding:0 0 12px;}
+    .login-feature .lf-title { font-size: 0.9rem; font-weight: 600; margin: 0 0 2px; color: #fff; }
+    .login-feature .lf-desc { font-size: 0.79rem; color: rgba(255, 255, 255, 0.52); margin: 0; line-height: 1.55; }
+    .lbp-copy { position: relative; font-size: 0.76rem; color: rgba(255, 255, 255, 0.42); }
   </style>
 </head>
-<body>
+<body class="login-page">
 
-  <div class="glass-card">
-    <div class="card-header">
-      <img src="{{ asset('logo.jpg') }}" alt="Logo"
-           style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.75);
-                  box-shadow:0 4px 14px rgba(0,0,0,.35);margin-bottom:8px;object-fit:cover;">
-      <div>Admin Login</div>
+  {{-- ============ Left: brand panel ============ --}}
+  <div class="login-brand-panel">
+    <span class="lbp-glow lbp-glow-1"></span>
+    <span class="lbp-glow lbp-glow-2"></span>
+
+    <div class="lbp-brand">
+      <span class="login-icon-tile"><i class="fas fa-suitcase-rolling"></i></span>
+      <span class="lbp-name">Shahriar Worldwide Venture</span>
     </div>
 
-    <div class="card-body">
-      @if(session('error'))
-        <div class="alert alert-danger py-2 mb-3">{{ session('error') }}</div>
-      @endif
-
-      <form method="POST" action="{{ route('login.submit') }}">
-        @csrf
-
-        <div class="form-floating mb-3">
-          <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required autofocus>
-          <label for="email">Email address</label>
-        </div>
-
-        <div class="form-floating mb-3">
-          <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
-          <label for="password">Password</label>
-        </div>
-
-        <div class="check-row">
-          <div class="form-check m-0">
-            <input class="form-check-input" type="checkbox" id="showOff">
-            <label class="form-check-label" for="showOff" style="color: rgba(6, 56, 17, 1);">Keep me signed in</label>
-          </div>
-        </div>
-
-        <div class="links-row">
-          <a href="">Register now</a>
-          <a href="">Forgot password?</a>
-        </div>
-
-        <button class="btn btn-theme w-100 py-2">Login</button>
-      </form>
+    <div>
+      <h1 class="lbp-headline">Run your passport operation with confidence</h1>
+      <p class="lbp-tagline">One secure place to manage agents, applications, processing stages, deliveries and reports.</p>
     </div>
 
-    <div class="tiny">© {{ date('Y') }} — Secure Access Panel</div>
+    <div class="login-features">
+      <div class="login-feature">
+        <span class="lf-icon"><i class="fas fa-passport"></i></span>
+        <div>
+          <p class="lf-title">Track every passport</p>
+          <p class="lf-desc">Follow each application from agent handover to final delivery.</p>
+        </div>
+      </div>
+      <div class="login-feature">
+        <span class="lf-icon"><i class="fas fa-gears"></i></span>
+        <div>
+          <p class="lf-title">Control processing</p>
+          <p class="lf-desc">Monitor pending, ongoing and completed files in real time.</p>
+        </div>
+      </div>
+      <div class="login-feature">
+        <span class="lf-icon"><i class="fas fa-user-shield"></i></span>
+        <div>
+          <p class="lf-title">Coordinate the team</p>
+          <p class="lf-desc">Keep agents, officers and employees aligned on every file.</p>
+        </div>
+      </div>
+      <div class="login-feature">
+        <span class="lf-icon"><i class="fas fa-chart-pie"></i></span>
+        <div>
+          <p class="lf-title">See the full picture</p>
+          <p class="lf-desc">Lifecycle reports on processing, collection and delivery.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="lbp-copy">&copy; {{ date('Y') }} Shahriar Worldwide Venture. Secure admin access.</p>
   </div>
 
+  {{-- ============ Right: form ============ --}}
+  <div class="login-form-side">
+    <div style="width:100%;max-width:420px;">
+      {{-- Mobile brand (panel is hidden on small screens) — icon tile, no logo image --}}
+      <div class="login-mobile-brand d-lg-none">
+        <span class="login-icon-tile dark"><i class="fas fa-suitcase-rolling"></i></span>
+        <span class="lmb-text">Passport MS</span>
+      </div>
+
+      <div class="login-card">
+        <span class="login-badge"><i class="fas fa-shield-halved"></i> Admin access only</span>
+        <h1 class="login-title">Welcome back</h1>
+        <p class="login-sub">Sign in to your admin account</p>
+
+        @if(session('error'))
+          <div class="alert alert-danger mt-3 py-2">{{ session('error') }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('login.submit') }}" class="mt-4">
+          @csrf
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" class="form-control w-100" id="email" name="email"
+                   placeholder="admin@example.com" value="{{ old('email') }}" required autofocus
+                   autocomplete="email">
+          </div>
+
+          <div class="mb-2">
+            <label for="password" class="form-label">Password</label>
+            <div class="position-relative">
+              <input type="password" class="form-control w-100 pe-5" id="password" name="password"
+                     placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
+                <i class="far fa-eye" id="pwIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end mb-3">
+            <a href="#" class="text-decoration-none" style="font-size:.78rem;font-weight:600">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 d-block">
+            <i class="fas fa-arrow-right-to-bracket me-1"></i> Sign in
+          </button>
+        </form>
+      </div>
+
+      <p class="login-footnote">&copy; {{ date('Y') }} Shahriar Worldwide Venture · Secure admin access</p>
+    </div>
+  </div>
+
+  <script>
+    // Password visibility toggle
+    document.getElementById('pwToggle').addEventListener('click', function () {
+      var input = document.getElementById('password');
+      var icon = document.getElementById('pwIcon');
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      icon.classList.toggle('fa-eye', !show);
+      icon.classList.toggle('fa-eye-slash', show);
+      this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  </script>
 </body>
 </html>
