@@ -36,7 +36,7 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17/dist/sweetalert2.min.css" rel="stylesheet">
 
     <!-- Admin design system -->
-    <link href="{{ asset('css/theme.css') }}?v=3" rel="stylesheet">
+    <link href="{{ asset('css/theme.css') }}?v=4" rel="stylesheet">
 
     <!-- Flatpickr (date-range filters on list/report pages) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">

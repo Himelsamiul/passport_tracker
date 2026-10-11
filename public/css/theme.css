@@ -42,6 +42,15 @@
   --cyan: #38c8f0;    --cyan-soft: rgba(56, 200, 240, 0.14);
   --teal: #2dd4bf;    --teal-soft: rgba(45, 212, 191, 0.14);
 
+  /* Text colors used on the soft status surfaces (badges, alerts, chips) */
+  --ok-text: #5fe394;
+  --danger-text: #ff8f98;
+  --warn-text: #ffd98a;
+  --info-text: #7adcfa;
+  --brand-text: #9dbcf7;
+  --neutral-text: #b9c2d4;
+  --purple-text: #bda6ff;
+
   /* Shape & depth */
   --radius: 14px;
   --radius-sm: 10px;
@@ -95,6 +104,23 @@ body.light-mode {
   --purple-soft: rgba(124, 58, 237, 0.1);
   --cyan-soft: rgba(8, 145, 178, 0.1);
   --teal-soft: rgba(13, 148, 136, 0.1);
+
+  /* Darker status shades for white surfaces — keeps badges/icons readable */
+  --green: #16a34a;
+  --amber: #b45309;
+  --red: #dc2626;
+  --purple: #6d28d9;
+  --cyan: #0369a1;
+  --teal: #0f766e;
+
+  /* Badge/alert text: deep, high-contrast shades on the light tints */
+  --ok-text: #15803d;
+  --danger-text: #b91c1c;
+  --warn-text: #92400e;
+  --info-text: #075985;
+  --brand-text: #1d4ed8;
+  --neutral-text: #475569;
+  --purple-text: #5b21b6;
 
   --header-bg: rgba(255, 255, 255, 0.88);
   --nav-hover: rgba(15, 23, 42, 0.055);
@@ -715,7 +741,7 @@ a > .kpi-card:hover, .kpi-card.kpi-hover:hover {
   color: var(--amber);
   box-shadow: none;
 }
-.btn-warning:hover { background: rgba(245, 182, 63, 0.24); border-color: rgba(245, 182, 63, 0.5); color: #ffd98a; }
+.btn-warning:hover { background: rgba(245, 182, 63, 0.24); border-color: rgba(245, 182, 63, 0.5); color: var(--warn-text); }
 
 .btn-danger {
   background: var(--red-soft);
@@ -747,7 +773,7 @@ a > .kpi-card:hover, .kpi-card.kpi-hover:hover {
   color: var(--cyan);
   box-shadow: none;
 }
-.btn-info:hover { background: rgba(56, 200, 240, 0.24); border-color: rgba(56, 200, 240, 0.5); color: #7adcfa; }
+.btn-info:hover { background: rgba(56, 200, 240, 0.24); border-color: rgba(56, 200, 240, 0.5); color: var(--info-text); }
 
 .btn-outline-secondary {
   border: 1px solid var(--line-strong);
@@ -787,16 +813,16 @@ a > .kpi-card:hover, .kpi-card.kpi-hover:hover {
   border-radius: 999px;
   border: 1px solid transparent;
 }
-.badge.bg-success, .badge.text-bg-success { background: var(--green-soft) !important; color: #5fe394 !important; border-color: rgba(34, 197, 94, 0.28); }
-.badge.bg-danger,  .badge.text-bg-danger  { background: var(--red-soft) !important;  color: #ff8f98 !important; border-color: rgba(240, 97, 109, 0.28); }
-.badge.bg-warning, .badge.text-bg-warning { background: var(--amber-soft) !important; color: #ffd98a !important; border-color: rgba(245, 182, 63, 0.28); }
-.badge.bg-info,    .badge.text-bg-info    { background: var(--cyan-soft) !important;  color: #7adcfa !important; border-color: rgba(56, 200, 240, 0.28); }
-.badge.bg-primary, .badge.text-bg-primary { background: var(--accent-soft) !important; color: #9dbcf7 !important; border-color: rgba(78, 134, 232, 0.3); }
-.badge.bg-secondary, .badge.text-bg-secondary { background: rgba(148, 163, 184, 0.14) !important; color: #b9c2d4 !important; border-color: rgba(148, 163, 184, 0.24); }
-.badge.bg-dark, .badge.text-bg-dark { background: rgba(148, 163, 184, 0.14) !important; color: #b9c2d4 !important; border-color: rgba(148, 163, 184, 0.24); }
+.badge.bg-success, .badge.text-bg-success { background: var(--green-soft) !important; color: var(--ok-text) !important; border-color: rgba(34, 197, 94, 0.28); }
+.badge.bg-danger,  .badge.text-bg-danger  { background: var(--red-soft) !important;  color: var(--danger-text) !important; border-color: rgba(240, 97, 109, 0.28); }
+.badge.bg-warning, .badge.text-bg-warning { background: var(--amber-soft) !important; color: var(--warn-text) !important; border-color: rgba(245, 182, 63, 0.28); }
+.badge.bg-info,    .badge.text-bg-info    { background: var(--cyan-soft) !important;  color: var(--info-text) !important; border-color: rgba(56, 200, 240, 0.28); }
+.badge.bg-primary, .badge.text-bg-primary { background: var(--accent-soft) !important; color: var(--brand-text) !important; border-color: rgba(78, 134, 232, 0.3); }
+.badge.bg-secondary, .badge.text-bg-secondary { background: rgba(148, 163, 184, 0.14) !important; color: var(--neutral-text) !important; border-color: rgba(148, 163, 184, 0.24); }
+.badge.bg-dark, .badge.text-bg-dark { background: rgba(148, 163, 184, 0.14) !important; color: var(--neutral-text) !important; border-color: rgba(148, 163, 184, 0.24); }
 .badge.bg-light, .badge.text-bg-light { background: var(--card-2) !important; color: var(--text-soft) !important; border-color: var(--line); }
 .badge.text-bg-light, .badge.text-bg-light i { color: var(--text-soft) !important; }
-.badge.bg-purple { background: var(--purple-soft) !important; color: #bda6ff !important; border-color: rgba(154, 123, 247, 0.28); }
+.badge.bg-purple { background: var(--purple-soft) !important; color: var(--purple-text) !important; border-color: rgba(154, 123, 247, 0.28); }
 
 /* --------------------------------------------------------------------------
    11. Forms
@@ -880,7 +906,7 @@ select.form-select option, select.form-control option {
   margin-top: 5px;
 }
 .form-control.is-invalid:focus, .form-select.is-invalid:focus { box-shadow: 0 0 0 3px rgba(240, 97, 109, 0.3); border-color: var(--red); }
-.invalid-feedback { color: #ff9ba3; font-size: 0.78rem; }
+.invalid-feedback { color: var(--danger-text); font-size: 0.78rem; }
 
 /* Legacy niceties from old pages — inherit the dark controls */
 .fx, .select-fx, .input-group .form-control {
@@ -979,11 +1005,11 @@ select.form-select option, select.form-control option {
   font-size: 0.865rem;
   padding: 0.8rem 1.05rem;
 }
-.alert-success { background: var(--green-soft); border-color: rgba(34, 197, 94, 0.3); color: #7fe8a5; }
-.alert-danger  { background: var(--red-soft);  border-color: rgba(240, 97, 109, 0.3); color: #ff9ba3; }
-.alert-warning { background: var(--amber-soft); border-color: rgba(245, 182, 63, 0.3); color: #ffd98a; }
-.alert-info    { background: var(--cyan-soft);  border-color: rgba(56, 200, 240, 0.3); color: #7adcfa; }
-.alert-primary { background: var(--accent-soft); border-color: rgba(78, 134, 232, 0.32); color: #9dbcf7; }
+.alert-success { background: var(--green-soft); border-color: rgba(34, 197, 94, 0.3); color: var(--ok-text); }
+.alert-danger  { background: var(--red-soft);  border-color: rgba(240, 97, 109, 0.3); color: var(--danger-text); }
+.alert-warning { background: var(--amber-soft); border-color: rgba(245, 182, 63, 0.3); color: var(--warn-text); }
+.alert-info    { background: var(--cyan-soft);  border-color: rgba(56, 200, 240, 0.3); color: var(--info-text); }
+.alert-primary { background: var(--accent-soft); border-color: rgba(78, 134, 232, 0.32); color: var(--brand-text); }
 .alert a { color: inherit; font-weight: 600; text-decoration: underline; }
 
 /* --------------------------------------------------------------------------
@@ -1422,7 +1448,7 @@ body.login-page {
   border-radius: 999px;
   background: var(--accent-soft);
   border: 1px solid rgba(78, 134, 232, 0.32);
-  color: #9dbcf7;
+  color: var(--brand-text);
   padding: 5px 13px;
   font-size: 0.74rem;
   font-weight: 600;
