@@ -90,6 +90,7 @@
               <div class="detail-row"><span class="d-label">Phone</span><span class="d-value">{{ $passport->phone ?? '—' }}</span></div>
               <div class="detail-row"><span class="d-label">NID Number</span><span class="d-value">{{ $passport->nid_number ?? '—' }}</span></div>
               <div class="detail-row"><span class="d-label">Nationality</span><span class="d-value">{{ $passport->nationality ?? '—' }}</span></div>
+              <div class="detail-row"><span class="d-label">Country</span><span class="d-value">{{ $passport->country ?? '—' }}</span></div>
               <div class="detail-row"><span class="d-label">Address</span><span class="d-value">{{ $passport->address ?? '—' }}</span></div>
             </div>
             <div class="col-md-6">

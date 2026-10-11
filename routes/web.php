@@ -46,6 +46,7 @@ Route::middleware(['auth.session'])->group(function () {
     // -------- Passports CRUD --------
     Route::get('/passports', [PassportController::class, 'index'])->middleware('perm:passports.view')->name('passports.index');
     Route::get('/passports/create', [PassportController::class, 'create'])->middleware('perm:passports.create')->name('passports.create');
+    Route::get('/passports/check-number', [PassportController::class, 'checkNumber'])->middleware('perm:passports.view')->name('passports.check');
     Route::post('/passports/store', [PassportController::class, 'store'])->middleware('perm:passports.create')->name('passports.store');
     Route::get('/passports/edit/{id}', [PassportController::class, 'edit'])->middleware('perm:passports.edit')->name('passports.edit');
     Route::post('/passports/update/{id}', [PassportController::class, 'update'])->middleware('perm:passports.edit')->name('passports.update');

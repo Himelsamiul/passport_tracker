@@ -6,6 +6,7 @@
 @section('content')
 {{-- ============================================================
      ডিজাইন নোট (পাসপোর্ট এডিট পেজে যা কাজ হয়েছে):
+     • Notun: Country searchable dropdown (Select2) + passport number live duplicate check (nijer record bad diye) + unique validation.
      • নতুন ডার্ক থিমে ফর্ম কার্ড; উপরে পেজ হেডার + "Back to List" বাটন।
      • ফিল্ডগুলো সেকশনে সাজানো: Stakeholder + Passport Informations।
      • সব পুরনো ভ্যালু, ফিল্ড-নেম ও ভ্যালিডেশন আগের মতোই।
@@ -73,6 +74,15 @@
             <input type="text" name="nationality" value="{{ old('nationality', $passport->nationality) }}" class="form-control">
           </div>
 
+          {{-- Country — searchable dropdown --}}
+          <div class="col-md-4">
+            <label class="form-label">Country</label>
+            <select name="country" class="form-select" id="country-select">
+              <option value="">— Select Country —</option>
+              @include('backend.pages.fixed.passports._countries', ['selected' => old('country', $passport->country)])
+            </select>
+          </div>
+
           <div class="col-md-6">
             <label class="form-label">Address</label>
             <input type="text" name="address" value="{{ old('address', $passport->address) }}" class="form-control">
@@ -85,7 +95,9 @@
 
           <div class="col-md-3">
             <label class="form-label">Passport Number <span class="text-danger">*</span></label>
-            <input type="text" name="passport_number" value="{{ old('passport_number', $passport->passport_number) }}" class="form-control" required>
+            <input type="text" name="passport_number" value="{{ old('passport_number', $passport->passport_number) }}"
+                   id="passport_number" class="form-control" required autocomplete="off">
+            <div class="field-error" id="pnError"><i class="fas fa-circle-exclamation me-1"></i>This passport number already exists.</div>
           </div>
 
           <div class="col-md-4">
@@ -114,4 +126,60 @@
     </div>
   </div>
 </div>
+
+{{-- Select2 for the searchable Country dropdown --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+@push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    $('#country-select').select2({
+      placeholder: "Type or select country...",
+      allowClear: true,
+      width: '100%'
+    });
+
+    // Live duplicate check (ignores this passport's own number)
+    var pnInput = document.getElementById('passport_number');
+    var pnError = document.getElementById('pnError');
+    var pnTimer = null, pnDuplicate = false;
+    var ignoreId = {{ $passport->id }};
+
+    function checkPassportNumber() {
+      var number = pnInput.value.trim();
+      if (number === '') {
+        pnDuplicate = false;
+        pnInput.classList.remove('is-invalid');
+        pnError.style.display = 'none';
+        return;
+      }
+      fetch("{{ route('passports.check') }}?number=" + encodeURIComponent(number) + "&ignore_id=" + ignoreId)
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          pnDuplicate = !!d.exists;
+          pnInput.classList.toggle('is-invalid', pnDuplicate);
+          pnError.style.display = pnDuplicate ? 'block' : 'none';
+        })
+        .catch(function () {});
+    }
+
+    pnInput.addEventListener('input', function () {
+      clearTimeout(pnTimer);
+      pnTimer = setTimeout(checkPassportNumber, 350);
+    });
+    pnInput.addEventListener('blur', checkPassportNumber);
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+      if (pnDuplicate) {
+        e.preventDefault();
+        pnInput.classList.add('is-invalid');
+        pnError.style.display = 'block';
+        pnInput.focus();
+      }
+    });
+  });
+</script>
+@endpush
 @endsection

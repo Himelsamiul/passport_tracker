@@ -871,6 +871,14 @@ select.form-select option, select.form-control option {
   border-color: var(--red);
   background-image: none;
 }
+/* Inline live-validation error (e.g. duplicate passport number) */
+.field-error {
+  display: none;
+  color: var(--red);
+  font-size: 0.76rem;
+  font-weight: 600;
+  margin-top: 5px;
+}
 .form-control.is-invalid:focus, .form-select.is-invalid:focus { box-shadow: 0 0 0 3px rgba(240, 97, 109, 0.3); border-color: var(--red); }
 .invalid-feedback { color: #ff9ba3; font-size: 0.78rem; }
 
@@ -1252,6 +1260,51 @@ div.notify[class*="inset-0"] {
   border-top: 1px solid var(--line-soft);
 }
 .app-footer .dot { opacity: 0.5; }
+
+/* --------------------------------------------------------------------------
+   19b. Select2 — dark dropdowns (searchable country/nationality selects)
+   -------------------------------------------------------------------------- */
+.select2-container--default .select2-selection--single {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  height: calc(1.5em + 1.04rem + 2px);
+  outline: none;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--text);
+  line-height: calc(1.5em + 1rem);
+  padding-left: 12px;
+  font-size: 0.875rem;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: var(--muted) transparent transparent transparent;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+.select2-dropdown {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+}
+.select2-dropdown .select2-search--dropdown .select2-search__field {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  margin: 8px;
+  width: calc(100% - 16px) !important;
+  outline: none;
+}
+.select2-results__option { color: var(--text-soft); font-size: 0.865rem; padding: 8px 14px; }
+.select2-container--default .select2-results__option--highlighted[aria-selected] { background: var(--accent); color: #fff; }
+.select2-container--default .select2-results__option[aria-selected="true"] { color: var(--accent-2); }
+.select2-container--default .select2-selection--single .select2-selection__placeholder { color: var(--faint); }
 
 /* --------------------------------------------------------------------------
    20. Login page — split screen

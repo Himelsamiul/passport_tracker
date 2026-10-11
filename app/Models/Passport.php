@@ -19,6 +19,7 @@ class Passport extends Model
         'date_of_birth',
         'passport_number',
         'nationality',
+        'country',
         'passport_picture',
         'issue_date',
         'expiry_date',

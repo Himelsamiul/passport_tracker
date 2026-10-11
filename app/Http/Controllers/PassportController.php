@@ -91,6 +91,28 @@ public function show($id)
         return view('backend.pages.fixed.passports.create', compact('agents', 'employees', 'officers'));
     }
 
+    /**
+     * Live duplicate check for the passport-number field: called from the
+     * forms as the admin types so the "already exists" error appears
+     * instantly, before submit.
+     */
+    public function checkNumber(Request $request)
+    {
+        $number = trim((string) $request->query('number', ''));
+        $ignoreId = (int) $request->query('ignore_id', 0);
+
+        $exists = false;
+        if ($number !== '') {
+            $q = Passport::where('passport_number', $number);
+            if ($ignoreId > 0) {
+                $q->where('id', '!=', $ignoreId);
+            }
+            $exists = $q->exists();
+        }
+
+        return response()->json(['exists' => $exists]);
+    }
+
     // STORE
     public function store(Request $request)
     {
@@ -104,11 +126,14 @@ public function show($id)
             'date_of_birth'        => ['nullable', 'date'],
             'passport_number'      => ['required', 'string', 'max:50', 'unique:passports,passport_number'],
             'nationality'          => ['nullable', 'string', 'max:100'],
+            'country'              => ['nullable', 'string', 'max:100'],
             'passport_picture'     => ['nullable', 'image', 'max:2048'],
             'issue_date'           => ['nullable', 'date'],
             'expiry_date'          => ['nullable', 'date', 'after_or_equal:issue_date'],
             'nid_number'           => ['nullable', 'string', 'max:50'],
             'notes'                => ['nullable', 'string', 'max:1000'],
+        ], [
+            'passport_number.unique' => 'This passport number already exists.',
         ]);
 
         $path = null;
@@ -126,6 +151,7 @@ public function show($id)
             'date_of_birth'       => $request->date_of_birth,
             'passport_number'     => $request->passport_number,
             'nationality'         => $request->nationality,
+            'country'             => $request->country,
             'passport_picture'    => $path,
             'issue_date'          => $request->issue_date,
             'expiry_date'         => $request->expiry_date,
@@ -162,11 +188,14 @@ public function show($id)
             'date_of_birth'        => ['nullable', 'date'],
             'passport_number'      => ['required', 'string', 'max:50', 'unique:passports,passport_number,' . $passport->id],
             'nationality'          => ['nullable', 'string', 'max:100'],
+            'country'              => ['nullable', 'string', 'max:100'],
             'passport_picture'     => ['nullable', 'image', 'max:2048'],
             'issue_date'           => ['nullable', 'date'],
             'expiry_date'          => ['nullable', 'date', 'after_or_equal:issue_date'],
             'nid_number'           => ['nullable', 'string', 'max:50'],
             'notes'                => ['nullable', 'string', 'max:1000'],
+        ], [
+            'passport_number.unique' => 'This passport number already exists.',
         ]);
 
         $path = $passport->passport_picture;
@@ -187,6 +216,7 @@ public function show($id)
             'date_of_birth'       => $request->date_of_birth,
             'passport_number'     => $request->passport_number,
             'nationality'         => $request->nationality,
+            'country'             => $request->country,
             'passport_picture'    => $path,
             'issue_date'          => $request->issue_date,
             'expiry_date'         => $request->expiry_date,

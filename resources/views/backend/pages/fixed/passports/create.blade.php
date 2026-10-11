@@ -6,6 +6,7 @@
 @section('content')
 {{-- ============================================================
      ডিজাইন নোট (পাসপোর্ট তৈরির পেজে যা কাজ হয়েছে):
+     • Notun: Country searchable dropdown (Select2) + passport number type korlei live duplicate check ("already exists" error niche dekhay) + server-side unique validation.
      • সবুজ/লাইট কাস্টম CSS পুরো বাদ — নতুন ডার্ক থিমে ফর্ম কার্ড।
      • ফর্ম দুইটি সেকশনে সাজানো: "Stakeholder Details" ও "Passport Informations"।
      • জাতীয়তা ড্রপডাউনে Select2 সার্চ আগের মতোই আছে — শুধু ডার্ক স্টাইল দেওয়া হয়েছে।
@@ -188,6 +189,15 @@
             </select>
           </div>
 
+          {{-- Country — searchable dropdown --}}
+          <div class="col-md-4">
+            <label class="form-label">Country</label>
+            <select name="country" class="form-select" id="country-select">
+              <option value="">— Select Country —</option>
+              @include('backend.pages.fixed.passports._countries', ['selected' => old('country')])
+            </select>
+          </div>
+
           <div class="col-md-8">
             <label class="form-label">Address <span class="text-danger">*</span></label>
             <input type="text" name="address" value="{{ old('address') }}" class="form-control" placeholder="Street, City, Postal Code" required>
@@ -200,7 +210,9 @@
 
           <div class="col-md-4">
             <label class="form-label">Passport Number <span class="text-danger">*</span></label>
-            <input type="text" name="passport_number" value="{{ old('passport_number') }}" class="form-control" placeholder="A1234567" required>
+            <input type="text" name="passport_number" value="{{ old('passport_number') }}" id="passport_number"
+                   class="form-control" placeholder="A1234567" required autocomplete="off">
+            <div class="field-error" id="pnError"><i class="fas fa-circle-exclamation me-1"></i>This passport number already exists.</div>
           </div>
 
           <div class="col-md-4">
@@ -261,6 +273,52 @@
       placeholder: "Type or select nationality...",
       allowClear: true,
       width: '100%'
+    });
+
+    // Searchable country
+    $('#country-select').select2({
+      placeholder: "Type or select country...",
+      allowClear: true,
+      width: '100%'
+    });
+
+    // Live duplicate check for the passport number — shows the error the
+    // moment an existing number is typed, before the form is submitted.
+    var pnInput = document.getElementById('passport_number');
+    var pnError = document.getElementById('pnError');
+    var pnTimer = null, pnDuplicate = false;
+
+    function checkPassportNumber() {
+      var number = pnInput.value.trim();
+      if (number === '') {
+        pnDuplicate = false;
+        pnInput.classList.remove('is-invalid');
+        pnError.style.display = 'none';
+        return;
+      }
+      fetch("{{ route('passports.check') }}?number=" + encodeURIComponent(number))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          pnDuplicate = !!d.exists;
+          pnInput.classList.toggle('is-invalid', pnDuplicate);
+          pnError.style.display = pnDuplicate ? 'block' : 'none';
+        })
+        .catch(function () {});
+    }
+
+    pnInput.addEventListener('input', function () {
+      clearTimeout(pnTimer);
+      pnTimer = setTimeout(checkPassportNumber, 350);
+    });
+    pnInput.addEventListener('blur', checkPassportNumber);
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+      if (pnDuplicate) {
+        e.preventDefault();
+        pnInput.classList.add('is-invalid');
+        pnError.style.display = 'block';
+        pnInput.focus();
+      }
     });
   });
 </script>
