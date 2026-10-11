@@ -123,9 +123,9 @@ class AdminUserController extends Controller
     /** Shared validation. On update, password stays optional. */
     private function validated(Request $request, ?int $ignoreId = null, bool $withPassword = false): array
     {
-        $emailRule = 'required|email|max:190|unique:users,email';
+        $emailRules = ['required', 'email', 'max:190', 'unique:users,email'];
         if ($ignoreId) {
-            $emailRule .= ',' . $ignoreId;
+            $emailRules[] = 'unique:users,email,' . $ignoreId;
         }
 
         $isMasterEdit = $ignoreId && User::find($ignoreId)?->isMaster();
@@ -136,7 +136,7 @@ class AdminUserController extends Controller
 
         $rules = [
             'name' => ['required', 'string', 'max:100'],
-            'email' => [$emailRule],
+            'email' => $emailRules,
             'role_id' => ['nullable', 'exists:roles,id'],
         ];
 
